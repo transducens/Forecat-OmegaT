@@ -58,7 +58,7 @@ public class ForecatPTS extends BaseTranslate {
 		outputLanguagesList = self.iface.getLanguages(inputLanguagesList);
 
 		StringBuilder sb = new StringBuilder();
-		for (LanguagesOutput s : outputLanguagesList) {
+		for (LanguagesOutput s : outputLanguagesList) { 
 			sb.append(s.getSourceName());
 			sb.append(" to ");
 			sb.append(s.getTargetName());
@@ -76,7 +76,9 @@ public class ForecatPTS extends BaseTranslate {
 		
 		// VM wide Cookie management
 		CookieManager cookieManager = new CookieManager();
+		CookieHandler.getDefault();
 		CookieHandler.setDefault(cookieManager);
+		
 
 		addForecatView();
 		ForecatPreferences.init();

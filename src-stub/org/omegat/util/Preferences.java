@@ -12,7 +12,7 @@ public class Preferences {
 		return null;
 	}
 
-	public static void setPreference(String fORECAT_CACHED_ACTIVE, String string) {
+	public static void setPreference(String fORECAT_CACHED_ACTIVE, Object string) {
 		// TODO Auto-generated method stub
 		
 	}

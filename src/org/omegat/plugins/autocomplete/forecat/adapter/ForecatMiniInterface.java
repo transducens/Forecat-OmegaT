@@ -66,6 +66,8 @@ public class ForecatMiniInterface extends IForecatInterface {
 		try {
 			outputTranslation = translation.translationService(
 					inputTranslation, session);
+			logTranslate(session);
+			
 		} catch (BboxcatException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
@@ -82,9 +84,9 @@ public class ForecatMiniInterface extends IForecatInterface {
 			SuggestionsInput inputSuggestions) {
 		ArrayList<SuggestionsOutput> outputSuggestionsList = null;
 		try {
-
 			outputSuggestionsList = (ArrayList<SuggestionsOutput>) suggestions
 					.suggestionsService(inputSuggestions, session);
+			logSuggestions(session, inputSuggestions, outputSuggestionsList);
 		} catch (BboxcatException e) {
 			e.printStackTrace();
 			System.err.println(e.getMessage());
@@ -99,6 +101,7 @@ public class ForecatMiniInterface extends IForecatInterface {
 		try {
 			outputSelection = selection.selectionService(inputSelection,
 					session);
+			logSelect(session, inputSelection, outputSelection);
 		} catch (BboxcatException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());

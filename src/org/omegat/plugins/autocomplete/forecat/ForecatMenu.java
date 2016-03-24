@@ -18,7 +18,7 @@ public class ForecatMenu {
     final JMenuItem forecatMenu;
     
    /**
-     * Constructor of the class, which initialises the control variables in the
+     * Constructor of the class, which initializes the control variables in the
      * class and menus.
      * @param match_coloring Object that controls the coloring in the matcher.
      */

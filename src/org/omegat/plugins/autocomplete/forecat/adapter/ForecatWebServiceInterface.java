@@ -106,7 +106,7 @@ public class ForecatWebServiceInterface extends IForecatInterface {
 
 			ret = new TranslationOutput(jo.getInt("numberSegments"),
 					jo.getInt("numberSegments"));
-
+			
 		} catch (Exception ex) {
 			System.err.println(ex.getMessage());
 			return null;

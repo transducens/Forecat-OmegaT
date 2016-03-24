@@ -303,5 +303,4 @@ OmegaT-Plugin: MachineTranslator
 Name: org.omegat.plugins.autocomplete.forecat.ForecatPTS
 OmegaT-Plugin: MachineTranslator
 
-Name: org.omegat.plugins.machinetranslators.cachetrans.Cachetrans
-OmegaT-Plugin: MachineTranslator
+

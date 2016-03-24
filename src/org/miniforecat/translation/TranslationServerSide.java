@@ -203,7 +203,6 @@ public class TranslationServerSide {
 							segmentCounts,
 							translation, "OmegaTMT", ss);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
