@@ -186,7 +186,7 @@ public class TranslationServerSide {
 					String casedTranslation = translations.get(i);
 					if (casedTranslation.length() > 1) {
 						if (Character.isUpperCase(casedTranslation.charAt(0))
-								&& !Character.isUpperCase(casedTranslation.charAt(2))) {
+								&& !Character.isUpperCase(casedTranslation.charAt(1))) {
 							casedTranslation = Character.toLowerCase(casedTranslation.charAt(0))
 									+ casedTranslation.substring(1);
 						}

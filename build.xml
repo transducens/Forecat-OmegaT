@@ -15,7 +15,7 @@
         <javac srcdir="src" destdir="build/classes" classpathref="classpath"/>
     </target>
 
-    <target name="jar">
+    <target name="jar" depends="compile">
         <mkdir dir="build/jar"/>
         <jar destfile="build/jar/omegat-forecat.jar" basedir="build/classes" manifest="MANIFEST.MF" />
     </target>
