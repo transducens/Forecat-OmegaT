@@ -8,9 +8,16 @@ import java.util.List;
 
 import org.miniforecat.suggestions.SuggestionsOutput;
 
-public class RankerLongestShortestOnly extends RankerShared {
+/**
+ * Chooses the longest and shortest suggestion of each position, starting with
+ * the closest position.
+ * 
+ * @author Daniel Torregrosa
+ * 
+ */
+public class RankerLongestShortestFromPosition extends RankerShared {
 
-	private static final long serialVersionUID = -602383668223842900L;
+	private static final long serialVersionUID = -6208413797820197425L;
 	RankerShared applyBefore = null;
 
 	public class SuggestionsOutputLengthComparator implements Comparator<SuggestionsOutput> {
@@ -54,17 +61,26 @@ public class RankerLongestShortestOnly extends RankerShared {
 
 		int iteration = 0;
 
+		// Iteration controls what length rank to pick: iteration 1 will pick
+		// longest and shortest,
+		// iteration 2 will pick 2nd longest and 2nd shortest...
 		while ((iteration <= biggestList / 2) && outputSuggestionsList.size() < maxSuggestions) {
 			for (Integer i : order) {
 				current = all.get(i);
 				if (iteration <= current.size() / 2) {
+					// Check if we have enough suggestions
 					if (outputSuggestionsList.size() >= maxSuggestions)
 						break;
+					// Add the iteration-th longest suggestion if it is not
+					// already on the result
 					if (!outputSuggestionsList.contains(current.get(current.size() - (1 + iteration)))) {
 						outputSuggestionsList.add(current.get(current.size() - (1 + iteration)));
 					}
+					// Check if we have enough suggestions
 					if (outputSuggestionsList.size() >= maxSuggestions)
 						break;
+					// Add the iteration-th shortest suggestion if it is not
+					// already on the result
 					if (!outputSuggestionsList.contains(current.get(iteration))) {
 						outputSuggestionsList.add(current.get(iteration));
 					}

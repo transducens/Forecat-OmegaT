@@ -11,8 +11,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -26,11 +27,13 @@ import org.omegat.util.Preferences;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.factories.FormFactory;
 
-import javax.swing.JRadioButton;
+import javax.swing.border.BevelBorder;
+import java.awt.BorderLayout;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import com.jgoodies.forms.layout.FormSpecs;
 
 public class ForecatPreferencesDialog extends JDialog {
 
@@ -40,13 +43,12 @@ public class ForecatPreferencesDialog extends JDialog {
 	private JButton cancelButton;
 	private JTabbedPane tabbedPane;
 	private JPanel panel_internal;
-
-	private DualList dualList;
 	private JPanel panel_preferences;
-	private JRadioButton rdbtn_local;
-	private JRadioButton rdbtn_api;
-	private JLabel lblForecatApiUrl;
-	private JTextField textfield_api;
+	private JCheckBoxList list;
+	private JLabel lblMinimumSubsegmentLength;
+	private JSpinner minimumSpinner;
+	private JLabel lblMaximumSubsegmentLength;
+	private JSpinner maximumSpinner;
 
 	/**
 	 * Launch the application.
@@ -68,16 +70,14 @@ public class ForecatPreferencesDialog extends JDialog {
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setTitle("Forecat preferences");
 		setBounds(100, 100, 624, 429);
-		getContentPane().setLayout(
-				new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel);
 		GridBagLayout gbl_contentPanel = new GridBagLayout();
 		gbl_contentPanel.columnWidths = new int[] { 0, 0 };
 		gbl_contentPanel.rowHeights = new int[] { 0, 0, 0, 0 };
 		gbl_contentPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_contentPanel.rowWeights = new double[] { 1.0, 1.0, 0.0,
-				Double.MIN_VALUE };
+		gbl_contentPanel.rowWeights = new double[] { 1.0, 1.0, 0.0, Double.MIN_VALUE };
 		contentPanel.setLayout(gbl_contentPanel);
 
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -115,117 +115,82 @@ public class ForecatPreferencesDialog extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 		}
-
-		panel_preferences = new JPanel();
-		tabbedPane.addTab("New tab", null, panel_preferences, null);
-		panel_preferences
-				.setLayout(new FormLayout(new ColumnSpec[] {
-						FormFactory.RELATED_GAP_COLSPEC,
-						FormFactory.DEFAULT_COLSPEC,
-						FormFactory.RELATED_GAP_COLSPEC,
-						ColumnSpec.decode("default:grow"), }, new RowSpec[] {
-						FormFactory.RELATED_GAP_ROWSPEC,
-						FormFactory.DEFAULT_ROWSPEC,
-						FormFactory.RELATED_GAP_ROWSPEC,
-						FormFactory.DEFAULT_ROWSPEC,
-						FormFactory.RELATED_GAP_ROWSPEC,
-						FormFactory.DEFAULT_ROWSPEC, }));
-
-		rdbtn_local = new JRadioButton("Use local forecat with OmegaT MT");
-		panel_preferences.add(rdbtn_local, "2, 2");
-
-		rdbtn_api = new JRadioButton("Use forecat API interface");
-		panel_preferences.add(rdbtn_api, "2, 4");
-
-		lblForecatApiUrl = new JLabel("Forecat API URL");
-		panel_preferences.add(lblForecatApiUrl, "2, 6, right, default");
-
-		textfield_api = new JTextField();
-		panel_preferences.add(textfield_api, "4, 6, fill, default");
-		textfield_api.setColumns(10);
-
-		panel_internal = new JPanel();
-		tabbedPane.addTab("OmegaT MT", null, panel_internal, null);
-		panel_internal
-				.setLayout(new BoxLayout(panel_internal, BoxLayout.X_AXIS));
-
-		dualList = new DualList();
-		panel_internal.add(dualList);
-
-		ButtonGroup group = new ButtonGroup();
-		group.add(rdbtn_api);
-		group.add(rdbtn_local);
-
-		ActionListener rbActionListener = new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				manageRdBtn();
-			}
-		};
 		
-		rdbtn_api.addActionListener(rbActionListener);
-		rdbtn_local.addActionListener(rbActionListener);
+				panel_preferences = new JPanel();
+				tabbedPane.addTab("General options", null, panel_preferences, null);
+						panel_preferences.setLayout(new FormLayout(new ColumnSpec[] {
+								FormSpecs.LABEL_COMPONENT_GAP_COLSPEC,
+								ColumnSpec.decode("207px"),
+								ColumnSpec.decode("354px"),
+								ColumnSpec.decode("28px"),},
+							new RowSpec[] {
+								FormSpecs.RELATED_GAP_ROWSPEC,
+								RowSpec.decode("20px"),
+								FormSpecs.RELATED_GAP_ROWSPEC,
+								RowSpec.decode("20px"),}));
+				
+						lblMinimumSubsegmentLength = new JLabel("Minimum subsegment length");
+						panel_preferences.add(lblMinimumSubsegmentLength, "2, 2, left, center");
+						
+								minimumSpinner = new JSpinner();
+								minimumSpinner.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
+								panel_preferences.add(minimumSpinner, "4, 2, left, top");
+								
+										lblMaximumSubsegmentLength = new JLabel("Maximum subsegment length");
+										panel_preferences.add(lblMaximumSubsegmentLength, "2, 4, left, center");
+										
+												maximumSpinner = new JSpinner();
+												panel_preferences.add(maximumSpinner, "4, 4, left, top");
+												
+														panel_internal = new JPanel();
+														tabbedPane.addTab("OmegaT MT", null, panel_internal, null);
+														panel_internal.setLayout(new BorderLayout(0, 0));
+														
+																list = new JCheckBoxList();
+																list.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+																panel_internal.add(list);
 
 		init();
 	}
 
 	private void init() {
-
-		if (Preferences.getPreference(ForecatPreferences.FORECAT_USE_API)
-				.equals("false")) {
-			rdbtn_local.setSelected(true);
-		} else {
-			rdbtn_api.setSelected(true);
-		}
-
-		textfield_api.setText(Preferences
-				.getPreference(ForecatPreferences.FORECAT_API_URL));
-
 		getOmegaTMT();
-		manageRdBtn();
-	}
 
-	private void manageRdBtn() {
-		if (rdbtn_api.isSelected()) {
-			textfield_api.setEnabled(true);
-		} else if (rdbtn_local.isSelected()) {
-			textfield_api.setEnabled(false);
-		}
+		minimumSpinner.setValue(Integer.parseInt(Preferences.getPreference(ForecatPreferences.FORECAT_MINIMUM_SUBSEGMENT_LENGTH)));
+		maximumSpinner.setValue(Integer.parseInt(Preferences.getPreference(ForecatPreferences.FORECAT_MAXIMUM_SUBSEGMENT_LENGTH)));
 	}
 
 	protected void getOmegaTMT() {
 		IMachineTranslation mt[];
 		MachineTranslateTextArea mtta = Core.getMachineTranslatePane();
 		Field f;
-		String enabled = Preferences
-				.getPreference(ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES);
-		String ignore = Preferences
-				.getPreference(ForecatPreferences.FORECAT_IGNORE_OMEGAT_ENGINES);
+		String enabled = Preferences.getPreference(ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES);
+		String ignore = Preferences.getPreference(ForecatPreferences.FORECAT_IGNORE_OMEGAT_ENGINES);
 
 		try {
 			f = MachineTranslateTextArea.class.getDeclaredField("translators");
 			f.setAccessible(true);
 			mt = (IMachineTranslation[]) f.get(mtta);
 
-			Method getNameMethod = IMachineTranslation.class
-					.getDeclaredMethod("getName");
+			Method getNameMethod = IMachineTranslation.class.getDeclaredMethod("getName");
 			getNameMethod.setAccessible(true);
 
+			DefaultListModel<JCheckBox> model = new DefaultListModel<JCheckBox>();
 			for (IMachineTranslation m : mt) {
 				String nameMethod = getNameMethod.invoke(m).toString();
 				if (!ignore.contains(":" + nameMethod.replace(":", ";") + ":")) {
-					if (enabled.contains(":" + nameMethod.replace(":", ";")
-							+ ":")) {
-						dualList.addRightItem(nameMethod);
+					JCheckBox jb = new JCheckBox(nameMethod);
+					if (enabled.contains(":" + nameMethod.replace(":", ";") + ":")) {
+						jb.setSelected(true);
 					} else {
-						dualList.addLeftItem(nameMethod);
+						jb.setSelected(false);
 					}
+					model.addElement(jb);
 				}
 				// System.out.println(getNameMethod.invoke(m));
 			}
-		} catch (NoSuchFieldException | SecurityException
-				| IllegalArgumentException | IllegalAccessException
+			list.setModel(model);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
 				| NoSuchMethodException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
@@ -260,26 +225,16 @@ public class ForecatPreferencesDialog extends JDialog {
 		StringBuilder aux = new StringBuilder();
 		aux.append(":");
 
-		for (String s : dualList.getRightItems()) {
-			aux.append(s.replace(":", ";"));
-			aux.append(":");
+		for (int i = 0; i < list.getModel().getSize(); i++) {
+			JCheckBox o = list.getModel().getElementAt(i);
+			if (o.isSelected()) {
+				aux.append(o.getText().replace(":", ";"));
+				aux.append(":");
+			}
 		}
-
-		Preferences.setPreference(
-				ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES,
-				aux.toString());
-
-		if (rdbtn_api.isSelected()) {
-			Preferences.setPreference(ForecatPreferences.FORECAT_USE_API,
-					"true");
-		} else {
-			Preferences.setPreference(ForecatPreferences.FORECAT_USE_API,
-					"false");
-		}
-
-		Preferences.setPreference(ForecatPreferences.FORECAT_API_URL,
-				textfield_api.getText());
-
+		Preferences.setPreference(ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES, aux.toString());
+		Preferences.setPreference(ForecatPreferences.FORECAT_MINIMUM_SUBSEGMENT_LENGTH, minimumSpinner.getValue());
+		Preferences.setPreference(ForecatPreferences.FORECAT_MAXIMUM_SUBSEGMENT_LENGTH, maximumSpinner.getValue());
 		ForecatPreferences.init();
 	}
 }

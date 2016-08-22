@@ -3,10 +3,24 @@ package org.miniforecat.ranker;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.miniforecat.exceptions.BboxcatException;
 import org.miniforecat.suggestions.SuggestionsOutput;
+import org.miniforecat.utils.Quicksort;
 
+/**
+ * Chooses the suggestions according to the light aligning model described in
+ * 
+ * Miquel Esplà-Gomis, Felipe Sánchez-Martínez, Mikel L Forcada. A Simple
+ * Approach to Use Bilingual Information Sources for Word Alignment. En
+ * Procesamiento del Lenguaje Natural, 49 (XXVIII Conferència de la Sociedad
+ * Española de Procesamiento del Lenguaje Natural, 5-7.9.2012, Castelló de la
+ * Plana), p. 93–100.
+ * 
+ * @author Daniel Torregrosa
+ * 
+ */
 public class RankerPressureBasic extends RankerShared {
+
+	private static final long serialVersionUID = -943641721379662135L;
 
 	protected static double[][] pressures;
 	// List of (((x,y),(xx,yy)),(pressure)
@@ -20,15 +34,13 @@ public class RankerPressureBasic extends RankerShared {
 		return pressures;
 	}
 
-	public static void setAlignments(
-			ArrayList<Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, Double>> a) {
+	public static void setAlignments(ArrayList<Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, Double>> a) {
 		alignments = a;
 
 	}
 
 	@Override
-	public List<SuggestionsOutput> rankerService(RankerInput rankinp, List<SuggestionsOutput> input)
-			throws BboxcatException {
+	public List<SuggestionsOutput> rankerService(RankerInput rankinp, List<SuggestionsOutput> input) {
 		ArrayList<SuggestionsOutput> outputSuggestionsList = new ArrayList<SuggestionsOutput>();
 		ArrayList<Integer> sortList = new ArrayList<Integer>();
 		SuggestionsOutput so;
@@ -42,7 +54,7 @@ public class RankerPressureBasic extends RankerShared {
 			for (int i = 0; i < so.getNumberWords() && so.getPosition() + i < pressures.length; i++) {
 				acumPressure += pressures[so.getPosition() + i][rankinp.getPosition()];
 			}
-
+			System.err.println(acumPressure);
 			so.setSuggestionFeasibility(acumPressure);
 		}
 		Quicksort q = new Quicksort();

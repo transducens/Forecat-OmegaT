@@ -3,14 +3,29 @@ package org.miniforecat.ranker;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.miniforecat.exceptions.BboxcatException;
 import org.miniforecat.suggestions.SuggestionsOutput;
+import org.miniforecat.utils.Quicksort;
 
+/**
+ * Chooses the suggestions according to the light aligning model described in
+ * 
+ * Miquel Esplà-Gomis, Felipe Sánchez-Martínez, Mikel L Forcada. A Simple
+ * Approach to Use Bilingual Information Sources for Word Alignment. En
+ * Procesamiento del Lenguaje Natural, 49 (XXVIII Conferència de la Sociedad
+ * Española de Procesamiento del Lenguaje Natural, 5-7.9.2012, Castelló de la
+ * Plana), p. 93–100.
+ * 
+ * with a new heuristic that penalizes (potentially) already aligned suggestions
+ * 
+ * @author Daniel Torregrosa
+ * 
+ */
 public class RankerPressureHeuristic extends RankerPressureBasic {
 
+	private static final long serialVersionUID = 1882826662861238513L;
+
 	@Override
-	public List<SuggestionsOutput> rankerService(RankerInput rankinp, List<SuggestionsOutput> input)
-			throws BboxcatException {
+	public List<SuggestionsOutput> rankerService(RankerInput rankinp, List<SuggestionsOutput> input) {
 		ArrayList<SuggestionsOutput> outputSuggestionsList = new ArrayList<SuggestionsOutput>();
 		ArrayList<Integer> sortList = new ArrayList<Integer>();
 		SuggestionsOutput so;
@@ -34,7 +49,8 @@ public class RankerPressureHeuristic extends RankerPressureBasic {
 			endY = targetCoord.getValue();
 			weight = pair.getValue();
 
-			// System.out.println(weight + " " + startX + " " + endX + " " + startY + " " + endY);
+			// System.out.println(weight + " " + startX + " " + endX + " " +
+			// startY + " " + endY);
 			if (rankinp.getPosition() >= startY && rankinp.getPosition() < endY) {
 				for (int x = startX; x < endX && x < pressures.length; x++) {
 					pressureLine[x] += weight * (endY - startY);
@@ -46,6 +62,14 @@ public class RankerPressureHeuristic extends RankerPressureBasic {
 			}
 		}
 
+		// if (alignments.size() > 0) {
+		// System.out.println("&&& " + alignments.size());
+		// System.out.print("&&&&& ");
+		// for (int i = 0; i < pressureLine.length; i++) {
+		// System.out.print(" " + pressureLine[i]);
+		// }
+		// System.out.println();
+		// }
 		for (index = 0; index < input.size(); index++) {
 			sortList.add(index);
 			so = input.get(index);

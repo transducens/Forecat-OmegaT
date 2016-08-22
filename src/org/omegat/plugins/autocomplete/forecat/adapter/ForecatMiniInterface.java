@@ -12,10 +12,16 @@ import org.miniforecat.selection.SelectionInput;
 import org.miniforecat.selection.SelectionOutput;
 import org.miniforecat.suggestions.SuggestionsInput;
 import org.miniforecat.suggestions.SuggestionsOutput;
+import org.miniforecat.suggestions.SuggestionsRanker;
 import org.miniforecat.suggestions.SuggestionsShared;
 import org.miniforecat.translation.TranslationInput;
 import org.miniforecat.translation.TranslationOutput;
 import org.miniforecat.languages.LanguagesServerSide;
+import org.miniforecat.ranker.RankerComposite;
+import org.miniforecat.ranker.RankerLongestShortestFirst;
+import org.miniforecat.ranker.RankerLongestShortestFromPosition;
+import org.miniforecat.ranker.RankerPosition;
+import org.miniforecat.ranker.RankerShortestLongestFirst;
 import org.miniforecat.selection.SelectionShared;
 import org.miniforecat.selection.SelectionEqualsShared;
 import org.miniforecat.suggestions.SuggestionsBasic;
@@ -23,6 +29,7 @@ import org.miniforecat.translation.TranslationServerSide;
 
 /**
  * Interface with the simplified implementation of Forecat
+ * 
  * @author Daniel Torregrosa
  *
  */
@@ -33,27 +40,26 @@ public class ForecatMiniInterface extends IForecatInterface {
 	protected SuggestionsShared suggestions;
 	protected SelectionShared selection;
 	protected SessionShared session;
-	
+
 	public ForecatMiniInterface() {
 		super();
 		iface = this;
 		languages = new LanguagesServerSide();
 		session = new SessionBrowserSideConsole();
-		suggestions = new SuggestionsBasic();
+		suggestions = new SuggestionsRanker(new SuggestionsBasic(),
+				new RankerComposite(new RankerPosition(), new RankerLongestShortestFromPosition()));
 		translation = new TranslationServerSide();
 		selection = new SelectionEqualsShared();
 	}
 
 	@Override
-	public List<LanguagesOutput> getLanguages(
-			ArrayList<LanguagesInput> inputLanguagesList) {
+	public List<LanguagesOutput> getLanguages(ArrayList<LanguagesInput> inputLanguagesList) {
 		List<LanguagesOutput> outputLanguagesList = null;
 		try {
-			outputLanguagesList = languages.languagesService(
-					inputLanguagesList, session);
+			outputLanguagesList = languages.languagesService(inputLanguagesList, session);
 		} catch (BboxcatException e) {
 			e.printStackTrace();
-			System.out.println(e.getMessage());
+			System.err.println(e.getMessage());
 			System.exit(1);
 		}
 		return outputLanguagesList;
@@ -64,28 +70,26 @@ public class ForecatMiniInterface extends IForecatInterface {
 		TranslationOutput outputTranslation = null;
 
 		try {
-			outputTranslation = translation.translationService(
-					inputTranslation, session);
+			outputTranslation = translation.translationService(inputTranslation, session);
 			logTranslate(session);
-			
+
 		} catch (BboxcatException e) {
 			e.printStackTrace();
-			System.out.println(e.getMessage());
+			System.err.println(e.getMessage());
 			System.exit(1);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
-			outputTranslation = new TranslationOutput(0,0);
+			outputTranslation = new TranslationOutput(0, 0);
 		}
 		return outputTranslation;
 	}
 
 	@Override
-	public List<SuggestionsOutput> getSuggestions(
-			SuggestionsInput inputSuggestions) {
+	public List<SuggestionsOutput> getSuggestions(SuggestionsInput inputSuggestions) {
 		ArrayList<SuggestionsOutput> outputSuggestionsList = null;
 		try {
-			outputSuggestionsList = (ArrayList<SuggestionsOutput>) suggestions
-					.suggestionsService(inputSuggestions, session);
+			outputSuggestionsList = (ArrayList<SuggestionsOutput>) suggestions.suggestionsService(inputSuggestions,
+					session);
 			logSuggestions(session, inputSuggestions, outputSuggestionsList);
 		} catch (BboxcatException e) {
 			e.printStackTrace();
@@ -99,12 +103,11 @@ public class ForecatMiniInterface extends IForecatInterface {
 	public SelectionOutput select(SelectionInput inputSelection) {
 		SelectionOutput outputSelection = null;
 		try {
-			outputSelection = selection.selectionService(inputSelection,
-					session);
+			outputSelection = selection.selectionService(inputSelection, session);
 			logSelect(session, inputSelection, outputSelection);
 		} catch (BboxcatException e) {
 			e.printStackTrace();
-			System.out.println(e.getMessage());
+			System.err.println(e.getMessage());
 			System.exit(1);
 		}
 		return outputSelection;

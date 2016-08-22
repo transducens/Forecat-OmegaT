@@ -4,5 +4,7 @@ public interface AbstractAutoCompleterView {
 
 	boolean shouldCloseOnSelection();
 
+	void updateViewData();
+
 
 }

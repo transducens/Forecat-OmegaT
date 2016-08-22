@@ -4,8 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.miniforecat.suggestions.SuggestionsOutput;
+import org.miniforecat.utils.Quicksort;
 
+/**
+ * Alternates between the longest and shortest suggestions
+ * 
+ * @author Daniel Torregrosa
+ * 
+ */
 public class RankerLongestShortestFirst extends RankerShared {
+
+	private static final long serialVersionUID = 2151574862257494336L;
 
 	@Override
 	public List<SuggestionsOutput> rankerService(RankerInput rankInp, List<SuggestionsOutput> input) {

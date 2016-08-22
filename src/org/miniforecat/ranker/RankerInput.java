@@ -1,7 +1,10 @@
 package org.miniforecat.ranker;
 
-public class RankerInput{
+import java.io.Serializable;
 
+public class RankerInput implements Serializable {
+
+	private static final long serialVersionUID = -4156758184297340851L;
 	int position;
 
 	public int getPosition() {

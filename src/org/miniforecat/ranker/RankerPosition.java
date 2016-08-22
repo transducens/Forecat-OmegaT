@@ -4,8 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.miniforecat.suggestions.SuggestionsOutput;
+import org.miniforecat.utils.Quicksort;
 
+/**
+ * Chooses the closest suggestions
+ * 
+ * @author Daniel Torregrosa
+ * 
+ */
 public class RankerPosition extends RankerShared {
+
+	private static final long serialVersionUID = 185266502718735714L;
 
 	@Override
 	public List<SuggestionsOutput> rankerService(RankerInput rankInp, List<SuggestionsOutput> input) {

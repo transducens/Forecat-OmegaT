@@ -21,6 +21,8 @@ public class SuggestionsBasic extends SuggestionsShared {
 			Map<String, List<SourceSegment>> segmentPairs, Map<String, Integer> segmentCounts) {
 
 		SortedSet<SuggestionsOutput> preoutput = new TreeSet<SuggestionsOutput>();
+		String originalTyped = input.getPrefixText();
+		input.setPrefixText(input.getPrefixText().toLowerCase());
 
 		Iterator<Entry<String, List<SourceSegment>>> it = segmentPairs.entrySet().iterator();
 		while (it.hasNext()) {
@@ -40,15 +42,38 @@ public class SuggestionsBasic extends SuggestionsShared {
 					closerId = ss.getId() + "." + SubIdProvider.getSubId(e.getKey(), ss);
 				}
 			}
-			if (UtilsShared.isPrefix(input.getPrefixText(), e.getKey())
-					&& segmentCounts.get(e.getKey()) > 0) {
-				preoutput.add(new SuggestionsOutput(e.getKey(), e.getKey().length(), closerId,
-						closerPosition, e.getKey().split(" ").length));
+			if (UtilsShared.isPrefix(input.getPrefixText(), e.getKey()) && segmentCounts.get(e.getKey()) > 0) {
+				preoutput.add(new SuggestionsOutput(e.getKey(), e.getKey().length(), closerId, closerPosition,
+						e.getKey().split(" ").length));
 			}
 		}
 
-		List<SuggestionsOutput> output = new ArrayList<SuggestionsOutput>(preoutput);
+		ArrayList<SuggestionsOutput> output = new ArrayList<SuggestionsOutput>(preoutput);
+
+		manageCaps(output, originalTyped);
 
 		return output;
+	}
+
+	public static void manageCaps(ArrayList<SuggestionsOutput> outputSuggestionsList, String typed) {
+		String newString = "";
+		int atchar = 0;
+		for (SuggestionsOutput sg : outputSuggestionsList) {
+			newString = "";
+			for (atchar = 0; atchar < typed.length() && atchar < sg.getSuggestionText().length(); atchar++) {
+				if (Character.isUpperCase(typed.charAt(atchar))) {
+					newString += Character.toUpperCase(sg.getSuggestionText().charAt(atchar));
+				} else {
+					newString += sg.getSuggestionText().charAt(atchar);
+				}
+			}
+
+			while (atchar < sg.getSuggestionText().length()) {
+				newString += sg.getSuggestionText().charAt(atchar);
+				atchar++;
+			}
+
+			sg.setSuggestionText(newString);
+		}
 	}
 }

@@ -18,6 +18,7 @@ import org.omegat.plugins.autocomplete.forecat.adapter.ForecatWebServiceInterfac
 import org.omegat.plugins.autocomplete.forecat.adapter.IForecatInterface;
 import org.omegat.plugins.autocomplete.forecat.gui.ForecatAutoCompleteView;
 import org.omegat.plugins.autocomplete.forecat.preferences.ForecatPreferences;
+import org.omegat.plugins.sessionlog.SessionLogPluginAccesser;
 import org.omegat.util.Language;
 
 /**
@@ -32,21 +33,29 @@ public class ForecatPTS extends BaseTranslate {
 	private IForecatInterface iface;
 	private static ForecatPTS self;
 
+	private static int maxSegmentLength = 4;
+	private static int minSegmentLength = 1;
+
 	public static void useSuggestion(AutoCompleterItem item) {
-		if (item != null)
-			self.iface.select(new SelectionInput(item.extras[0], 0));
+		if (item != null) {
+			// System.out.println(item.extras[1]);
+			if (item.extras.length > 4) {
+				self.iface
+						.select(new SelectionInput(item.payload, 0, item.extras[1], Integer.parseInt(item.extras[4])));
+			} else {
+				self.iface.select(new SelectionInput(item.payload, 0, item.extras[1], item.payload.split(" ").length));
+			}
+		}
 	}
 
-	public enum InterfaceType {LOCAL, API}
-	
-	public static void initInterface(InterfaceType it)
-	{
-		if (it.equals(InterfaceType.LOCAL))
-		{
+	public enum InterfaceType {
+		LOCAL, API
+	}
+
+	public static void initInterface(InterfaceType it) {
+		if (it.equals(InterfaceType.LOCAL)) {
 			self.iface = new ForecatMiniInterface();
-		}
-		else if (it.equals(InterfaceType.API))
-		{
+		} else if (it.equals(InterfaceType.API)) {
 			self.iface = new ForecatWebServiceInterface();
 		}
 
@@ -58,7 +67,7 @@ public class ForecatPTS extends BaseTranslate {
 		outputLanguagesList = self.iface.getLanguages(inputLanguagesList);
 
 		StringBuilder sb = new StringBuilder();
-		for (LanguagesOutput s : outputLanguagesList) { 
+		for (LanguagesOutput s : outputLanguagesList) {
 			sb.append(s.getSourceName());
 			sb.append(" to ");
 			sb.append(s.getTargetName());
@@ -66,19 +75,18 @@ public class ForecatPTS extends BaseTranslate {
 		}
 		System.out.println("Languages: " + sb.toString());
 	}
-	
+
 	/**
 	 * Initialize and add the plugin
 	 */
 	public ForecatPTS() {
 		self = this;
 		new ForecatMenu();
-		
+
 		// VM wide Cookie management
 		CookieManager cookieManager = new CookieManager();
 		CookieHandler.getDefault();
 		CookieHandler.setDefault(cookieManager);
-		
 
 		addForecatView();
 		ForecatPreferences.init();
@@ -86,29 +94,41 @@ public class ForecatPTS extends BaseTranslate {
 
 	@Override
 	protected String getPreferenceName() {
-		return "Forecat_pts";
+		return "Forecat-OmegaT";
 	}
 
 	public String getName() {
-		return "forecat_pts";
+		return "Forecat-OmegaT";
 	}
-
-
 
 	@Override
 	protected String translate(Language sLang, Language tLang, String text) {
-		TranslationInput inputTranslation = new TranslationInput(text, sLang,
-				tLang, 4, 1);
+		TranslationInput inputTranslation = new TranslationInput(text, sLang, tLang, maxSegmentLength,
+				minSegmentLength);
 		TranslationOutput outputTranslation = null;
-		outputTranslation = IForecatInterface.getForecatInterface().translate(
-				inputTranslation);
+		outputTranslation = IForecatInterface.getForecatInterface().translate(inputTranslation);
 
 		return ("Number of segments: " + outputTranslation.getNumberSegments() + "\n");
 
 	}
 
 	public static void addForecatView() {
-		Core.getEditor().getAutoCompleter()
-				.addView(new ForecatAutoCompleteView());
+		Core.getEditor().getAutoCompleter().addView(new ForecatAutoCompleteView());
+	}
+
+	public static int getMaxSegmentLength() {
+		return maxSegmentLength;
+	}
+
+	public static void setMaxSegmentLength(int msl) {
+		maxSegmentLength = msl;
+	}
+
+	public static int getMinSegmentLength() {
+		return minSegmentLength;
+	}
+
+	public static void setMinSegmentLength(int msl) {
+		minSegmentLength = msl;
 	}
 }

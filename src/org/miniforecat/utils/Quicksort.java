@@ -1,4 +1,4 @@
-package org.miniforecat.ranker;
+package org.miniforecat.utils;
 
 import java.util.List;
 

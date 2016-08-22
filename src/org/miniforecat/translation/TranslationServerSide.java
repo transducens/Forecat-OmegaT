@@ -23,8 +23,7 @@ import org.omegat.util.Preferences;
 
 public class TranslationServerSide {
 
-	public TranslationOutput translationService(
-			TranslationInput inputTranslation, SessionShared session)
+	public TranslationOutput translationService(TranslationInput inputTranslation, SessionShared session)
 			throws Exception {
 
 		final Map<String, List<SourceSegment>> segmentPairs = new HashMap<String, List<SourceSegment>>();
@@ -34,15 +33,13 @@ public class TranslationServerSide {
 		if (aux != null) {
 			currentId = (Integer) aux;
 		}
-		List<SourceSegment> sourceSegments = sliceIntoSegments(
-				slice(inputTranslation.getSourceText()),
-				inputTranslation.getMaxSegmentLenth(),
-				inputTranslation.getMinSegmentLenth(), currentId);
+		List<SourceSegment> sourceSegments = sliceIntoSegments(slice(inputTranslation.getSourceText()),
+				inputTranslation.getMaxSegmentLenth(), inputTranslation.getMinSegmentLenth(), currentId);
 		session.setAttribute("segmentPairs", segmentPairs);
 		session.setAttribute("segmentCounts", segmentCounts);
 
-		translateOmegaTMT(sourceSegments, inputTranslation.getSourceCode(),
-				inputTranslation.getTargetCode(), segmentPairs, segmentCounts);
+		translateOmegaTMT(sourceSegments, inputTranslation.getSourceCode(), inputTranslation.getTargetCode(),
+				segmentPairs, segmentCounts);
 
 		return new TranslationOutput(segmentPairs.size(), sourceSegments.size());
 	}
@@ -51,15 +48,14 @@ public class TranslationServerSide {
 		return text.split("\\s+");
 	}
 
-	public static List<SourceSegment> sliceIntoSegments(String[] words,
-			int maxSegmentLength, int minSegmentLength, int currentId) {
+	public static List<SourceSegment> sliceIntoSegments(String[] words, int maxSegmentLength, int minSegmentLength,
+			int currentId) {
 
 		int wordCount = words.length;
 		int partialId = 0;
 
 		if (wordCount * maxSegmentLength > PropertiesShared.maxSegments) {
-			wordCount = (int) Math.floor(PropertiesShared.maxSegments
-					/ maxSegmentLength);
+			wordCount = (int) Math.floor(PropertiesShared.maxSegments / maxSegmentLength);
 		}
 
 		List<SourceSegment> sourceSegments = new ArrayList<SourceSegment>();
@@ -74,8 +70,7 @@ public class TranslationServerSide {
 					sourceText += delim + words[i + j];
 					delim = " ";
 					if (j >= (minSegmentLength - 1)) {
-						sourceSegments.add(new SourceSegment(sourceText, i,
-								false, currentId + partialId, numchars));
+						sourceSegments.add(new SourceSegment(sourceText, i, false, currentId + partialId, numchars));
 						partialId++;
 					}
 				} else {
@@ -87,25 +82,20 @@ public class TranslationServerSide {
 		return sourceSegments;
 	}
 
-	protected static void addSegments(
-			Map<String, List<SourceSegment>> segmentPairs,
-			Map<String, Integer> segmentCounts, String targetText,
-			String engine, SourceSegment sourceSegment) {
+	protected static void addSegments(Map<String, List<SourceSegment>> segmentPairs, Map<String, Integer> segmentCounts,
+			String targetText, String engine, SourceSegment sourceSegment) {
 		// sourceSegment does not contain any engines yet
 		if (!targetText.isEmpty()) {
-			addSegment(segmentPairs, segmentCounts, targetText, engine,
-					sourceSegment);
-			String targetTextLowercase = UtilsShared
-					.uncapitalizeFirstLetter(targetText);
-			addSegment(segmentPairs, segmentCounts, targetTextLowercase,
-					engine, new SourceSegment(sourceSegment));
+			addSegment(segmentPairs, segmentCounts, targetText, engine, sourceSegment);
+			// String targetTextLowercase =
+			// UtilsShared.uncapitalizeFirstLetter(targetText);
+			// addSegment(segmentPairs, segmentCounts, targetTextLowercase,
+			// engine, new SourceSegment(sourceSegment));
 		}
 	}
 
-	protected static void addSegment(
-			Map<String, List<SourceSegment>> segmentPairs,
-			Map<String, Integer> segmentCounts, String targetText,
-			String engine, SourceSegment sourceSegment) {
+	protected static void addSegment(Map<String, List<SourceSegment>> segmentPairs, Map<String, Integer> segmentCounts,
+			String targetText, String engine, SourceSegment sourceSegment) {
 		SourceSegment s = null;
 
 		SubIdProvider.addElement(targetText, sourceSegment);
@@ -114,10 +104,8 @@ public class TranslationServerSide {
 			segmentPairs.put(targetText, new ArrayList<SourceSegment>());
 			segmentCounts.put(targetText, 0);
 		} else {
-			s = SourceSegment.searchByTextAndPosition(
-					segmentPairs.get(targetText),
-					sourceSegment.getSourceSegmentText(),
-					sourceSegment.getPosition());
+			s = SourceSegment.searchByTextAndPosition(segmentPairs.get(targetText),
+					sourceSegment.getSourceSegmentText(), sourceSegment.getPosition());
 		}
 		if (s != null) {
 			s.addEngine(engine);
@@ -141,24 +129,20 @@ public class TranslationServerSide {
 			f.setAccessible(true);
 			mt = (IMachineTranslation[]) f.get(mtta);
 
-			Method getNameMethod = IMachineTranslation.class
-					.getDeclaredMethod("getName");
+			Method getNameMethod = IMachineTranslation.class.getDeclaredMethod("getName");
 			getNameMethod.setAccessible(true);
 			for (IMachineTranslation m : mt) {
 				String nameMethod = getNameMethod.invoke(m).toString();
-				if (!Preferences.getPreference(
-						ForecatPreferences.FORECAT_IGNORE_OMEGAT_ENGINES)
+				if (!Preferences.getPreference(ForecatPreferences.FORECAT_IGNORE_OMEGAT_ENGINES)
 						.contains(":" + nameMethod.replace(":", ";") + ":")) {
-					if (Preferences.getPreference(
-							ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES)
+					if (Preferences.getPreference(ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES)
 							.contains(":" + nameMethod.replace(":", ";") + ":")) {
 						ret.add(m);
 					}
 				}
 				// System.out.println(getNameMethod.invoke(m));
 			}
-		} catch (NoSuchFieldException | SecurityException
-				| IllegalArgumentException | IllegalAccessException
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
 				| NoSuchMethodException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
@@ -166,44 +150,76 @@ public class TranslationServerSide {
 		return ret;
 	}
 
-	private void translateOmegaTMT(List<SourceSegment> sourceSegments,
-			Language sLang, Language tLang,
-			Map<String, List<SourceSegment>> segmentPairs,
-			Map<String, Integer> segmentCounts) {
+	private void translateOmegaTMT(List<SourceSegment> sourceSegments, Language sLang, Language tLang,
+			Map<String, List<SourceSegment>> segmentPairs, Map<String, Integer> segmentCounts) {
 
-		Iterator<SourceSegment> it = sourceSegments.iterator();
 		List<IMachineTranslation> enabledMT = getOmegaTMT();
-		String translation;
-		SourceSegment ss;
+		String translation = null;
+		boolean oldEnabledField = false;
+		Method m;
+		Field enabledField = null;
 
 		if (enabledMT.size() == 0) {
 			System.err.println("No MT system enabled for forecat_PTS");
 			return;
 		}
 
-		while (it.hasNext()) {
-			ss = it.next();
-			for (IMachineTranslation im : enabledMT) {
-				try {
-					translation = im.getTranslation(sLang, tLang,
-							ss.getSourceSegmentText());
+		for (IMachineTranslation im : enabledMT) {
+			try {
+				// Check if the IMachineTranslation implementation provides a
+				// massTranslate method
+				m = im.getClass().getDeclaredMethod("massTranslate", Language.class, Language.class, List.class);
+				// If so, use it
+				ArrayList<String> segments = new ArrayList<String>();
+				for (SourceSegment ss : sourceSegments) {
+					segments.add(ss.getSourceSegmentText());
+				}
+				@SuppressWarnings("unchecked")
+				List<String> translations = (List<String>) m.invoke(im, sLang, tLang, segments);
+				for (int i = 0; i < sourceSegments.size(); i++) {
 					
-					if (translation == null)
-					{
-						Field enabledField = BaseTranslate.class.getDeclaredField("enabled");
-						enabledField.setAccessible(true);
-						enabledField.set(((BaseTranslate)im), true);
-						translation = im.getTranslation(sLang, tLang,
-								ss.getSourceSegmentText());
-						enabledField.set(((BaseTranslate)im), false);
+					/*	Only remove the capitalization of the first letter if a word starts in capital. 
+					 * 	If the second word is capitalized, we suppose its an acronym
+					 * 
+					 */
+					
+					String casedTranslation = translations.get(i);
+					if (casedTranslation.length() > 1) {
+						if (Character.isUpperCase(casedTranslation.charAt(0))
+								&& !Character.isUpperCase(casedTranslation.charAt(2))) {
+							casedTranslation = Character.toLowerCase(casedTranslation.charAt(0))
+									+ casedTranslation.substring(1);
+						}
 					}
-					
-					addSegments(
-							segmentPairs,
-							segmentCounts,
-							translation, "OmegaTMT", ss);
-				} catch (Exception e) {
-					e.printStackTrace();
+
+					addSegment(segmentPairs, segmentCounts, casedTranslation, "omegaTMT", sourceSegments.get(i));
+				}
+			} catch (IllegalArgumentException | NoSuchMethodException | SecurityException | IllegalAccessException
+					| InvocationTargetException e) {
+				// Else, translate segment by segment
+				e.printStackTrace();
+				e.getCause().printStackTrace();
+				try {
+					enabledField = BaseTranslate.class.getDeclaredField("enabled");
+					enabledField.setAccessible(true);
+					oldEnabledField = enabledField.getBoolean(im);
+					enabledField.set(((BaseTranslate) im), true);
+				} catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException ex) {
+					ex.printStackTrace();
+				}
+
+				for (SourceSegment ss : sourceSegments) {
+					try {
+						translation = im.getTranslation(sLang, tLang, ss.getSourceSegmentText());
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+					addSegments(segmentPairs, segmentCounts, translation.toLowerCase(), "OmegaTMT", ss);
+				}
+				try {
+					enabledField.set(((BaseTranslate) im), oldEnabledField);
+				} catch (IllegalArgumentException | IllegalAccessException ex) {
+					ex.printStackTrace();
 				}
 			}
 		}

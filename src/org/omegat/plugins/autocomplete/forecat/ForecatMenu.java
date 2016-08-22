@@ -24,7 +24,7 @@ public class ForecatMenu {
      */
     public ForecatMenu() {
 
-        forecatMenu = new JMenuItem("Forecat configuration");
+        forecatMenu = new JMenuItem("Forecat-OmegaT preferences");
         forecatMenu.setEnabled(true);
         forecatMenu.addActionListener(geometricRecommendingMenuItemActionListener);
             

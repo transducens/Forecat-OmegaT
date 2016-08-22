@@ -3,11 +3,17 @@ package org.miniforecat.ranker;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.miniforecat.exceptions.BboxcatException;
 import org.miniforecat.suggestions.SuggestionsOutput;
 
+/**
+ * Composes a pair of rankers so one is applied before the other.
+ * 
+ * @author Daniel Torregrosa
+ * 
+ */
 public class RankerComposite extends RankerShared {
 
+	private static final long serialVersionUID = -1229745996571442964L;
 	RankerShared applyBefore = null;
 	RankerShared applyAfter = null;
 
@@ -21,11 +27,10 @@ public class RankerComposite extends RankerShared {
 	}
 
 	@Override
-	public List<SuggestionsOutput> rankerService(RankerInput rankInp, List<SuggestionsOutput> input)
-			throws BboxcatException {
+	public List<SuggestionsOutput> rankerService(RankerInput rankInp, List<SuggestionsOutput> input){
 		ArrayList<SuggestionsOutput> outputSuggestionsList = new ArrayList<SuggestionsOutput>();
 
-		// Only the last ranker limits the number of suggestions to be shown
+		// Only the last ranker should limit the number of suggestions to be shown
 		int holdmaxSuggestions = maxSuggestions;
 		maxSuggestions = Integer.MAX_VALUE;
 		input = applyBefore.rankerService(rankInp, input);

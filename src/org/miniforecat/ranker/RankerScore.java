@@ -4,12 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.miniforecat.suggestions.SuggestionsOutput;
+import org.miniforecat.utils.Quicksort;
+
+/**
+ * Chooses the suggestions based in their score
+ * 
+ * @author Daniel Torregrosa
+ * 
+ */
 
 public class RankerScore extends RankerShared {
 
+	private static final long serialVersionUID = -7278773616524632991L;
+
 	@Override
-	public List<SuggestionsOutput> rankerService(RankerInput rankinput,
-			List<SuggestionsOutput> input) {
+	public List<SuggestionsOutput> rankerService(RankerInput rankinput, List<SuggestionsOutput> input) {
 
 		ArrayList<SuggestionsOutput> outputSuggestionsList = new ArrayList<SuggestionsOutput>();
 		ArrayList<Integer> sortList = new ArrayList<Integer>();

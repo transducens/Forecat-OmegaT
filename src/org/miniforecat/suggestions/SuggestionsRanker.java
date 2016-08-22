@@ -23,7 +23,7 @@ public class SuggestionsRanker extends SuggestionsShared {
 		List<SuggestionsOutput> output = base.obtainSuggestions(input, segmentPairs, segmentCounts);
 		try {
 			output = ranker.rankerService(rankerInput, output);
-		} catch (BboxcatException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return output;

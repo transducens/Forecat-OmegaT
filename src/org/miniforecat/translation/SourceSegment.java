@@ -33,6 +33,7 @@ public class SourceSegment {
 		this.used = s.used;
 		this.engineList = new ArrayList<String>(s.engineList);
 		this.id = s.id;
+		this.charPosition = s.charPosition;
 	}
 
 	public String getSourceSegmentText() {
