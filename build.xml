@@ -17,7 +17,7 @@
 
     <target name="jar" depends="compile">
         <mkdir dir="build/jar"/>
-        <jar destfile="build/jar/omegat-forecat.jar" basedir="build/classes" manifest="MANIFEST.MF" />
+        <jar destfile="build/jar/forecat-omegat.jar" basedir="build/classes" manifest="MANIFEST.MF" />
     </target>
 
 </project>
