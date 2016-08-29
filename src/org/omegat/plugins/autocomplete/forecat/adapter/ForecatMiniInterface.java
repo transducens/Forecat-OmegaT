@@ -43,22 +43,19 @@ public class ForecatMiniInterface extends IForecatInterface {
 
 	public ForecatMiniInterface() {
 		super();
-
 		iface = this;
 		languages = new LanguagesServerSide();
 		session = new SessionBrowserSideConsole();
-		suggestions = new SuggestionsRanker(new SuggestionsBasic(), new RankerNeuralNetwork());
 		translation = new TranslationServerSide();
 		selection = new SelectionEqualsShared();
 	}
-	
-	public void useHeuristic()
-	{
-		suggestions = new SuggestionsRanker(new SuggestionsBasic(), new RankerNeuralNetwork());
+
+	public void useHeuristic() {
+		suggestions = new SuggestionsRanker(new SuggestionsBasic(),
+				new RankerComposite(new RankerPosition(), new RankerLongestShortestFromPosition()));
 	}
-	
-	public void useNeural()
-	{
+
+	public void useNeural() {
 		suggestions = new SuggestionsRanker(new SuggestionsBasic(), new RankerNeuralNetwork());
 	}
 

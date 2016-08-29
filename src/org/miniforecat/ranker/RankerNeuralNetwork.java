@@ -21,7 +21,7 @@ public class RankerNeuralNetwork extends RankerPressureBasic {
 	private static float ratioDev = 1;
 
 	public RankerNeuralNetwork() {
-		// ann = new Fann(getAnnFile());
+		 ann = new Fann(getAnnFile());
 	}
 
 	public static void setDiffAvg(float da) {
@@ -509,7 +509,6 @@ public class RankerNeuralNetwork extends RankerPressureBasic {
 
 	public static void setAnnFile(String annFile) {
 		RankerNeuralNetwork.annFile = annFile;
-		ann = new Fann(getAnnFile());
 	}
 
 }
