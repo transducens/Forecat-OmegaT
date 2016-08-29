@@ -1,6 +1,5 @@
 package org.omegat.plugins.autocomplete.forecat.gui;
 
-import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +8,10 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
 import org.apache.commons.lang.StringUtils;
+import org.miniforecat.ranker.Pair;
 import org.miniforecat.suggestions.SuggestionsInput;
 import org.miniforecat.suggestions.SuggestionsOutput;
+import org.miniforecat.utils.AlignmentsHelper;
 import org.omegat.gui.editor.autocompleter.AutoCompleterItem;
 import org.omegat.gui.editor.autocompleter.AutoCompleterListView;
 import org.omegat.plugins.autocomplete.forecat.ForecatPTS;
@@ -26,9 +27,21 @@ public class ForecatAutoCompleteView extends AutoCompleterListView {
 		super("Forecat");
 	}
 
+	public static String sourceSentence = "";
+	private static int currentSegmentPos;
+	private static int lastSegmentUsed;
+	private static int lastSegmentLength;
+	private static int sourceWords;
+
+	public static void setSourceSentence(String ss) {
+		sourceSentence = ss;
+		sourceWords = sourceSentence.split(" ").length;
+	}
+
 	@Override
 	public AutoCompleterItem getSelectedValue() {
 		AutoCompleterItem toRet;
+		lastSegmentUsed = currentSegmentPos;
 		if (itemBeingTabbed >= 0) {
 			AutoCompleterItem selected = lastResult.get(itemBeingTabbed);
 			String words[] = selected.payload.split(" ");
@@ -41,7 +54,7 @@ public class ForecatAutoCompleteView extends AutoCompleterListView {
 			}
 			toRet = new AutoCompleterItem(realSuggestion.toString(),
 					new String[] { selected.extras[0], selected.extras[1], selected.extras[2], selected.extras[3],
-							"" + numberWordsTabbed },
+							selected.extras[4], "" + numberWordsTabbed },
 					selected.cursorAdjust, selected.keepSelection, selected.replacementLength);
 			ForecatPTS.useSuggestion(toRet);
 		} else {
@@ -50,6 +63,7 @@ public class ForecatAutoCompleteView extends AutoCompleterListView {
 				ForecatPTS.useSuggestion(toRet);
 			}
 		}
+		lastSegmentLength = Integer.parseInt(toRet.extras[4]);
 		return toRet;
 	}
 
@@ -75,6 +89,8 @@ public class ForecatAutoCompleteView extends AutoCompleterListView {
 		if (currentSegmentStart != 0)
 			currentSegmentStart++;
 
+		currentSegmentPos = currentSegmentStart;
+		AlignmentsHelper.computeAlignments(prevText, sourceWords, prevText.split(" "), prevText.length());
 		String currentPrefix = prevText.substring(0, currentSegmentStart);
 		String currentSegment = prevText.substring(currentSegmentStart);
 
@@ -85,7 +101,8 @@ public class ForecatAutoCompleteView extends AutoCompleterListView {
 		ArrayList<AutoCompleterItem> result = new ArrayList<AutoCompleterItem>();
 
 		List<SuggestionsOutput> entries = ForecatMiniInterface.getForecatInterface()
-				.getSuggestions(new SuggestionsInput(currentPrefix, currentSegment, numWords));
+				.getSuggestions(new SuggestionsInput(currentPrefix, currentSegment, numWords, sourceSentence,
+						((currentSegmentPos - 1) == lastSegmentUsed), lastSegmentUsed, lastSegmentLength));
 		for (SuggestionsOutput sug : entries) {
 			index++;
 			String niceText;
@@ -97,9 +114,11 @@ public class ForecatAutoCompleteView extends AutoCompleterListView {
 						+ "</body></html>";
 			}
 
-			result.add(new AutoCompleterItem(sug.getSuggestionText() + " ",
-					new String[] { niceText, sug.getId(), "" + sug.getSuggestionFeasibility(), "" + sug.getPosition() },
-					currentSegment.length()));
+			result.add(
+					new AutoCompleterItem(sug.getSuggestionText() + " ",
+							new String[] { niceText, sug.getId(), "" + sug.getSuggestionFeasibility(),
+									"" + sug.getWordPosition(), "" + sug.getOriginalWordLength() },
+							currentSegment.length()));
 		}
 		lastResult = result;
 		return result;

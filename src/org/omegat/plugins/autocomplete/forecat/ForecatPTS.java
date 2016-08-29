@@ -7,9 +7,11 @@ import java.util.List;
 
 import org.miniforecat.languages.LanguagesInput;
 import org.miniforecat.languages.LanguagesOutput;
+import org.miniforecat.ranker.RankerNeuralNetwork;
 import org.miniforecat.selection.SelectionInput;
 import org.miniforecat.translation.TranslationInput;
 import org.miniforecat.translation.TranslationOutput;
+import org.miniforecat.utils.AlignmentsHelper;
 import org.omegat.core.Core;
 import org.omegat.core.machinetranslators.BaseTranslate;
 import org.omegat.gui.editor.autocompleter.AutoCompleterItem;
@@ -39,9 +41,9 @@ public class ForecatPTS extends BaseTranslate {
 	public static void useSuggestion(AutoCompleterItem item) {
 		if (item != null) {
 			// System.out.println(item.extras[1]);
-			if (item.extras.length > 4) {
+			if (item.extras.length > 5) {
 				self.iface
-						.select(new SelectionInput(item.payload, 0, item.extras[1], Integer.parseInt(item.extras[4])));
+						.select(new SelectionInput(item.payload, 0, item.extras[1], Integer.parseInt(item.extras[5])));
 			} else {
 				self.iface.select(new SelectionInput(item.payload, 0, item.extras[1], item.payload.split(" ").length));
 			}
@@ -103,6 +105,7 @@ public class ForecatPTS extends BaseTranslate {
 
 	@Override
 	protected String translate(Language sLang, Language tLang, String text) {
+		ForecatAutoCompleteView.setSourceSentence(text);
 		TranslationInput inputTranslation = new TranslationInput(text, sLang, tLang, maxSegmentLength,
 				minSegmentLength);
 		TranslationOutput outputTranslation = null;

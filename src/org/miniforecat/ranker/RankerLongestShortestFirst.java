@@ -3,6 +3,7 @@ package org.miniforecat.ranker;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.miniforecat.suggestions.SuggestionsInput;
 import org.miniforecat.suggestions.SuggestionsOutput;
 import org.miniforecat.utils.Quicksort;
 
@@ -17,7 +18,7 @@ public class RankerLongestShortestFirst extends RankerShared {
 	private static final long serialVersionUID = 2151574862257494336L;
 
 	@Override
-	public List<SuggestionsOutput> rankerService(RankerInput rankInp, List<SuggestionsOutput> input) {
+	public List<SuggestionsOutput> rankerService(SuggestionsInput rankInp, List<SuggestionsOutput> input) {
 		ArrayList<SuggestionsOutput> outputSuggestionsList = new ArrayList<SuggestionsOutput>();
 		ArrayList<Integer> sortList = new ArrayList<Integer>();
 		SuggestionsOutput so;

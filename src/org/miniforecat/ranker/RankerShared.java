@@ -3,6 +3,7 @@ package org.miniforecat.ranker;
 import java.io.Serializable;
 import java.util.List;
 
+import org.miniforecat.suggestions.SuggestionsInput;
 import org.miniforecat.suggestions.SuggestionsOutput;
 
 public abstract class RankerShared implements Serializable {
@@ -16,7 +17,7 @@ public abstract class RankerShared implements Serializable {
 		maxSuggestions = value;
 	}
 
-	public abstract List<SuggestionsOutput> rankerService(RankerInput rankinp,
+	public abstract List<SuggestionsOutput> rankerService(SuggestionsInput rankinp,
 			List<SuggestionsOutput> input);
 
 }

@@ -21,30 +21,46 @@ public class SuggestionsBasic extends SuggestionsShared {
 			Map<String, List<SourceSegment>> segmentPairs, Map<String, Integer> segmentCounts) {
 
 		SortedSet<SuggestionsOutput> preoutput = new TreeSet<SuggestionsOutput>();
-		String originalTyped = input.getPrefixText();
-		input.setPrefixText(input.getPrefixText().toLowerCase());
-
+		String originalTyped = input.getLastWordPrefix();
+		String originText = "";
 		Iterator<Entry<String, List<SourceSegment>>> it = segmentPairs.entrySet().iterator();
+		int closerPositionWords, closerDifference, closerPositionChars, i;
+
+		input.setPrefixText(input.getLastWordPrefix().toLowerCase());
+
 		while (it.hasNext()) {
 			Map.Entry<String, List<SourceSegment>> e = it.next();
 
-			int closerPosition = -1;
-			int closerDifference = 0;
+			closerPositionWords = -1;
+			closerDifference = 0;
+			closerPositionChars = 0;
 			String closerId = "";
 			for (SourceSegment ss : segmentPairs.get(e.getKey())) {
-				if (closerPosition == -1) {
-					closerPosition = ss.getPosition();
-					closerDifference = Math.abs(ss.getPosition() - input.getPrefixStart());
+				if (closerPositionWords == -1) {
+					closerPositionWords = ss.getPosition();
+					closerDifference = Math.abs(ss.getPosition() - input.getFixedPrefixWordLength());
 					closerId = ss.getId() + "." + SubIdProvider.getSubId(e.getKey(), ss);
-				} else if (Math.abs(ss.getPosition() - input.getPrefixStart()) < closerDifference) {
-					closerPosition = ss.getPosition();
-					closerDifference = Math.abs(ss.getPosition() - input.getPrefixStart());
+					originText = ss.getSourceSegmentText();
+				} else if (Math.abs(ss.getPosition() - input.getFixedPrefixWordLength()) < closerDifference) {
+					closerPositionWords = ss.getPosition();
+					closerDifference = Math.abs(ss.getPosition() - input.getFixedPrefixWordLength());
 					closerId = ss.getId() + "." + SubIdProvider.getSubId(e.getKey(), ss);
+					originText = ss.getSourceSegmentText();
 				}
 			}
-			if (UtilsShared.isPrefix(input.getPrefixText(), e.getKey()) && segmentCounts.get(e.getKey()) > 0) {
-				preoutput.add(new SuggestionsOutput(e.getKey(), e.getKey().length(), closerId, closerPosition,
-						e.getKey().split(" ").length));
+			i = 0;
+			for (String s : input.getSourceText().split(" ")) {
+				if (i == closerPositionWords)
+					break;
+				i++;
+				closerPositionChars += s.length() + 1; // Word + a space
+			}
+			if (closerPositionChars > 0)
+				closerPositionChars--; // Discount the last space
+
+			if (UtilsShared.isPrefix(input.getLastWordPrefix(), e.getKey()) && segmentCounts.get(e.getKey()) > 0) {
+				preoutput.add(new SuggestionsOutput(e.getKey(), originText, e.getKey().length(), closerId,
+						closerPositionWords, closerPositionChars));
 			}
 		}
 

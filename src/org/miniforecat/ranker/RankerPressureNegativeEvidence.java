@@ -10,22 +10,23 @@ import org.miniforecat.utils.Quicksort;
 /**
  * Chooses the suggestions according to the light aligning model described in
  * 
- * Miquel Esplà-Gomis, Felipe Sánchez-Martínez, Mikel L Forcada. A Simple Approach to Use Bilingual
- * Information Sources for Word Alignment. En Procesamiento del Lenguaje Natural, 49 (XXVIII
- * Conferència de la Sociedad Española de Procesamiento del Lenguaje Natural, 5-7.9.2012, Castelló
- * de la Plana), p. 93–100.
+ * Miquel Esplà-Gomis, Felipe Sánchez-Martínez, Mikel L Forcada. A Simple
+ * Approach to Use Bilingual Information Sources for Word Alignment. En
+ * Procesamiento del Lenguaje Natural, 49 (XXVIII Conferència de la Sociedad
+ * Española de Procesamiento del Lenguaje Natural, 5-7.9.2012, Castelló de la
+ * Plana), p. 93–100.
  * 
  * with a new heuristic that penalizes (potentially) already aligned suggestions
  * 
  * @author Daniel Torregrosa
  * 
  */
-public class RankerPressureHeuristic extends RankerPressureBasic {
+public class RankerPressureNegativeEvidence extends RankerPressureBasic {
 
 	private static final long serialVersionUID = 1882826662861238513L;
 
 	@Override
-	public List<SuggestionsOutput> rankerService(SuggestionsInput rankinp, List<SuggestionsOutput> input){
+	public List<SuggestionsOutput> rankerService(SuggestionsInput rankinp, List<SuggestionsOutput> input) {
 		ArrayList<SuggestionsOutput> outputSuggestionsList = new ArrayList<SuggestionsOutput>();
 		ArrayList<Integer> sortList = new ArrayList<Integer>();
 		SuggestionsOutput so;
@@ -50,9 +51,9 @@ public class RankerPressureHeuristic extends RankerPressureBasic {
 			weight = pair.getValue();
 
 			if (rankinp.getPosition() >= startY && rankinp.getPosition() < endY) {
-				for (int x = startX; x < endX && x < pressures.length; x++) {
-					pressureLine[x] += weight * (endY - startY);
-				}
+				// for (int x = startX; x < endX && x < pressures.length; x++) {
+				// pressureLine[x] += weight * (endY - startY);
+				// }
 			} else {
 				for (int x = startX; x < endX && x < pressures.length; x++) {
 					pressureLine[x] -= weight * (endY - startY);
@@ -73,9 +74,8 @@ public class RankerPressureHeuristic extends RankerPressureBasic {
 			so = input.get(index);
 			acumPressure = 0.0;
 
-			for (int i = 0; i < so.getSuggestionWordLength()
-					&& so.getWordPosition() + i < pressures.length; i++) {
-				acumPressure += pressureLine[so.getWordPosition() + i];
+			for (int i = 0; i < so.getSuggestionWordLength() && so.getWordPosition() + i < pressures.length; i++) {
+				acumPressure -= pressureLine[so.getWordPosition() + i];
 			}
 
 			so.setSuggestionFeasibility(acumPressure);

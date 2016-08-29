@@ -3,6 +3,7 @@ package org.miniforecat.ranker;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.miniforecat.suggestions.SuggestionsInput;
 import org.miniforecat.suggestions.SuggestionsOutput;
 import org.miniforecat.utils.Quicksort;
 
@@ -17,7 +18,7 @@ public class RankerPosition extends RankerShared {
 	private static final long serialVersionUID = 185266502718735714L;
 
 	@Override
-	public List<SuggestionsOutput> rankerService(RankerInput rankInp, List<SuggestionsOutput> input) {
+	public List<SuggestionsOutput> rankerService(SuggestionsInput rankInp, List<SuggestionsOutput> input) {
 		ArrayList<SuggestionsOutput> outputSuggestionsList = new ArrayList<SuggestionsOutput>();
 		ArrayList<Integer> sortList = new ArrayList<Integer>();
 		SuggestionsOutput so;
@@ -25,7 +26,7 @@ public class RankerPosition extends RankerShared {
 		for (int index = 0; index < input.size(); index++) {
 			sortList.add(index);
 			so = input.get(index);
-			so.setSuggestionFeasibility(Math.abs(so.getPosition() - rankInp.getPosition()));
+			so.setSuggestionFeasibility(Math.abs(so.getWordPosition() - rankInp.getPosition()));
 		}
 		Quicksort q = new Quicksort();
 		q.sort(sortList, input);

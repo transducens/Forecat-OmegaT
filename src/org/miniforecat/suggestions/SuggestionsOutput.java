@@ -1,24 +1,25 @@
 package org.miniforecat.suggestions;
 
-
-public class SuggestionsOutput implements Comparable<SuggestionsOutput>{
+public class SuggestionsOutput implements Comparable<SuggestionsOutput> {
 
 	String suggestionText;
+	String originalText;
 	double suggestionFeasibility;
-	int position;
-	int numberWords;
+	int wordPosition;
+	int charPosition;
 	String id;
 
 	protected SuggestionsOutput() {
 	}
 
-	public SuggestionsOutput(String suggestionText, double suggestionFeasibility, String id,
-			int position, int numberWords) {
+	public SuggestionsOutput(String suggestionText, String origText, double suggestionFeasibility, String id,
+			int wordPosition, int charPosition) {
 		this.suggestionText = suggestionText;
+		this.originalText = origText;
 		this.suggestionFeasibility = suggestionFeasibility;
 		this.id = id;
-		this.position = position;
-		this.numberWords = numberWords;
+		this.wordPosition = wordPosition;
+		this.charPosition = charPosition;
 	}
 
 	public void setSuggestionText(String suggestionText) {
@@ -41,12 +42,36 @@ public class SuggestionsOutput implements Comparable<SuggestionsOutput>{
 		return id;
 	}
 
-	public int getPosition() {
-		return position;
+	public int getWordPosition() {
+		return wordPosition;
 	}
 
-	public int getNumberWords() {
-		return numberWords;
+	public int getCharPosition() {
+		return charPosition;
+	}
+
+	public int getSuggestionWordLength() {
+		if ("".equals(suggestionText))
+			return 0;
+		return suggestionText.split(" ").length;
+	}
+
+	public int getSuggestionCharLength() {
+		return suggestionText.length();
+	}
+
+	public String getOriginal() {
+		return originalText;
+	}
+
+	public int getOriginalWordLength() {
+		if ("".equals(originalText))
+			return 0;
+		return originalText.split(" ").length;
+	}
+
+	public int getOriginalCharLength() {
+		return originalText.length();
 	}
 
 	@Override

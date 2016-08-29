@@ -20,6 +20,7 @@ import org.miniforecat.languages.LanguagesServerSide;
 import org.miniforecat.ranker.RankerComposite;
 import org.miniforecat.ranker.RankerLongestShortestFirst;
 import org.miniforecat.ranker.RankerLongestShortestFromPosition;
+import org.miniforecat.ranker.RankerNeuralNetwork;
 import org.miniforecat.ranker.RankerPosition;
 import org.miniforecat.ranker.RankerShortestLongestFirst;
 import org.miniforecat.selection.SelectionShared;
@@ -39,17 +40,26 @@ public class ForecatMiniInterface extends IForecatInterface {
 	protected TranslationServerSide translation;
 	protected SuggestionsShared suggestions;
 	protected SelectionShared selection;
-	protected SessionShared session;
 
 	public ForecatMiniInterface() {
 		super();
+
 		iface = this;
 		languages = new LanguagesServerSide();
 		session = new SessionBrowserSideConsole();
-		suggestions = new SuggestionsRanker(new SuggestionsBasic(),
-				new RankerComposite(new RankerPosition(), new RankerLongestShortestFromPosition()));
+		suggestions = new SuggestionsRanker(new SuggestionsBasic(), new RankerNeuralNetwork());
 		translation = new TranslationServerSide();
 		selection = new SelectionEqualsShared();
+	}
+	
+	public void useHeuristic()
+	{
+		suggestions = new SuggestionsRanker(new SuggestionsBasic(), new RankerNeuralNetwork());
+	}
+	
+	public void useNeural()
+	{
+		suggestions = new SuggestionsRanker(new SuggestionsBasic(), new RankerNeuralNetwork());
 	}
 
 	@Override

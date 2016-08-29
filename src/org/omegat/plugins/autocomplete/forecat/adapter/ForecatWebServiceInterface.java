@@ -23,15 +23,13 @@ public class ForecatWebServiceInterface extends IForecatInterface {
 
 	public static String BASEURL = "http://forecat-970.appspot.com/rest/services/";
 
-	public ForecatWebServiceInterface()
-	{
+	public ForecatWebServiceInterface() {
 		iface = this;
 	}
-	
+
 	@Override
-	public List<LanguagesOutput> getLanguages(
-			ArrayList<LanguagesInput> inputLanguagesList) {
-		
+	public List<LanguagesOutput> getLanguages(ArrayList<LanguagesInput> inputLanguagesList) {
+
 		ArrayList<LanguagesOutput> ret = new ArrayList<LanguagesOutput>();
 		try {
 			String url = BASEURL + "languagesService?";
@@ -45,11 +43,9 @@ public class ForecatWebServiceInterface extends IForecatInterface {
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("GET");
 			if (con.getResponseCode() != 200) {
-				throw new Exception("Error code " + con.getResponseCode()
-						+ " on request " + url);
+				throw new Exception("Error code " + con.getResponseCode() + " on request " + url);
 			}
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					con.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
 
@@ -63,9 +59,8 @@ public class ForecatWebServiceInterface extends IForecatInterface {
 			for (int i = 0; i < jarray.length(); i++) {
 				jo = jarray.getJSONObject(i);
 
-				ret.add(new LanguagesOutput(jo.getString("engine"), jo
-						.getString("sourceName"), jo.getString("sourceCode"),
-						jo.getString("targetName"), jo.getString("targetCode")));
+				ret.add(new LanguagesOutput(jo.getString("engine"), jo.getString("sourceName"),
+						jo.getString("sourceCode"), jo.getString("targetName"), jo.getString("targetCode")));
 
 			}
 		} catch (Exception ex) {
@@ -82,18 +77,16 @@ public class ForecatWebServiceInterface extends IForecatInterface {
 		try {
 			String url = BASEURL + "translationService?" + "sourceText="
 					+ URLEncoder.encode(inputTranslation.getSourceText(), "UTF-8") + "&sourceCode="
-					+ inputTranslation.getSourceCode() + "&targetCode="
-					+ inputTranslation.getTargetCode() + "&maxLength=4&minLength=1";
+					+ inputTranslation.getSourceCode() + "&targetCode=" + inputTranslation.getTargetCode()
+					+ "&maxLength=4&minLength=1";
 
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("GET");
 			if (con.getResponseCode() != 200) {
-				throw new Exception("Error code " + con.getResponseCode()
-						+ " on request " + url);
+				throw new Exception("Error code " + con.getResponseCode() + " on request " + url);
 			}
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					con.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
 
@@ -104,9 +97,8 @@ public class ForecatWebServiceInterface extends IForecatInterface {
 
 			JSONObject jo = new JSONObject(response.toString());
 
-			ret = new TranslationOutput(jo.getInt("numberSegments"),
-					jo.getInt("numberSegments"));
-			
+			ret = new TranslationOutput(jo.getInt("numberSegments"), jo.getInt("numberSegments"));
+
 		} catch (Exception ex) {
 			System.err.println(ex.getMessage());
 			return null;
@@ -116,24 +108,21 @@ public class ForecatWebServiceInterface extends IForecatInterface {
 	}
 
 	@Override
-	public List<SuggestionsOutput> getSuggestions(
-			SuggestionsInput inputSuggestions) {
+	public List<SuggestionsOutput> getSuggestions(SuggestionsInput inputSuggestions) {
 		List<SuggestionsOutput> ret = new ArrayList<SuggestionsOutput>();
 		try {
 			String url = BASEURL + "suggestionService?" + "targetText="
-					+ URLEncoder.encode(inputSuggestions.getTargetText(), "UTF-8") + "&prefixText="
-					+ URLEncoder.encode(inputSuggestions.getPrefixText(), "UTF-8") + "&position="
+					+ URLEncoder.encode(inputSuggestions.getFixedPrefix(), "UTF-8") + "&prefixText="
+					+ URLEncoder.encode(inputSuggestions.getLastWordPrefix(), "UTF-8") + "&position="
 					+ inputSuggestions.getPosition();
 
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("GET");
 			if (con.getResponseCode() != 200) {
-				throw new Exception("Error code " + con.getResponseCode()
-						+ " on request " + url);
+				throw new Exception("Error code " + con.getResponseCode() + " on request " + url);
 			}
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					con.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
 
@@ -146,11 +135,10 @@ public class ForecatWebServiceInterface extends IForecatInterface {
 			JSONObject jo;
 			for (int i = 0; i < jarray.length(); i++) {
 				jo = jarray.getJSONObject(i);
-
-				ret.add(new SuggestionsOutput(jo.getString("suggestionText"),
-						jo.getDouble("suggestionFeasibility"), jo
-								.getString("id"), jo.getInt("position"), jo
-								.getInt("numberWords")));
+				//TODO: BROKEN SERVICES
+				ret.add(new SuggestionsOutput(jo.getString("suggestionText"), jo.getString("originText"),
+						jo.getDouble("suggestionFeasibility"), jo.getString("id"), jo.getInt("wordPosition"),
+						jo.getInt("charPosition")));
 			}
 		} catch (Exception ex) {
 			System.err.println(ex.getMessage());
@@ -164,19 +152,16 @@ public class ForecatWebServiceInterface extends IForecatInterface {
 	public SelectionOutput select(SelectionInput inputSelection) {
 		SelectionOutput ret = null;
 		try {
-			String url = BASEURL + "selectionService?" + "text="
-					+ inputSelection.getId() + "&position="
+			String url = BASEURL + "selectionService?" + "text=" + inputSelection.getId() + "&position="
 					+ inputSelection.getPosition();
 
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("GET");
 			if (con.getResponseCode() != 200) {
-				throw new Exception("Error code " + con.getResponseCode()
-						+ " on request " + url);
+				throw new Exception("Error code " + con.getResponseCode() + " on request " + url);
 			}
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					con.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
 
@@ -195,6 +180,18 @@ public class ForecatWebServiceInterface extends IForecatInterface {
 		}
 
 		return ret;
+	}
+
+	@Override
+	public void useHeuristic() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void useNeural() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -1,6 +1,7 @@
 package org.omegat.plugins.autocomplete.forecat.preferences;
 
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -11,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -30,10 +32,17 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import javax.swing.border.BevelBorder;
 import java.awt.BorderLayout;
+import java.awt.FileDialog;
+
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
+
 import com.jgoodies.forms.layout.FormSpecs;
+import javax.swing.border.TitledBorder;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 public class ForecatPreferencesDialog extends JDialog {
 
@@ -49,6 +58,12 @@ public class ForecatPreferencesDialog extends JDialog {
 	private JSpinner minimumSpinner;
 	private JLabel lblMaximumSubsegmentLength;
 	private JSpinner maximumSpinner;
+	private JButton button;
+	private JTextField textField;
+	private JSpinner maxSuggestionsSpinner;
+	private JRadioButton rdbtnHeuristicRanker;
+	private JRadioButton rdbtnNeuralNetworkRanker;
+	private ButtonGroup radio;
 
 	/**
 	 * Launch the application.
@@ -115,40 +130,101 @@ public class ForecatPreferencesDialog extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 		}
-		
-				panel_preferences = new JPanel();
-				tabbedPane.addTab("General options", null, panel_preferences, null);
-						panel_preferences.setLayout(new FormLayout(new ColumnSpec[] {
-								FormSpecs.LABEL_COMPONENT_GAP_COLSPEC,
-								ColumnSpec.decode("207px"),
-								ColumnSpec.decode("354px"),
-								ColumnSpec.decode("28px"),},
-							new RowSpec[] {
-								FormSpecs.RELATED_GAP_ROWSPEC,
-								RowSpec.decode("20px"),
-								FormSpecs.RELATED_GAP_ROWSPEC,
-								RowSpec.decode("20px"),}));
-				
-						lblMinimumSubsegmentLength = new JLabel("Minimum subsegment length");
-						panel_preferences.add(lblMinimumSubsegmentLength, "2, 2, left, center");
-						
-								minimumSpinner = new JSpinner();
-								minimumSpinner.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
-								panel_preferences.add(minimumSpinner, "4, 2, left, top");
-								
-										lblMaximumSubsegmentLength = new JLabel("Maximum subsegment length");
-										panel_preferences.add(lblMaximumSubsegmentLength, "2, 4, left, center");
-										
-												maximumSpinner = new JSpinner();
-												panel_preferences.add(maximumSpinner, "4, 4, left, top");
-												
-														panel_internal = new JPanel();
-														tabbedPane.addTab("OmegaT MT", null, panel_internal, null);
-														panel_internal.setLayout(new BorderLayout(0, 0));
-														
-																list = new JCheckBoxList();
-																list.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-																panel_internal.add(list);
+
+		panel_preferences = new JPanel();
+		tabbedPane.addTab("General options", null, panel_preferences, null);
+		panel_preferences.setLayout(null);
+
+		JPanel panel = new JPanel();
+		panel.setBorder(
+				new TitledBorder(null, "Segmentation options", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel.setBounds(12, 12, 583, 76);
+		panel_preferences.add(panel);
+		panel.setLayout(new FormLayout(
+				new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow(9)"),
+						FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+				new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, }));
+
+		lblMinimumSubsegmentLength = new JLabel("Minimum subsegment length");
+		panel.add(lblMinimumSubsegmentLength, "2, 2");
+
+		minimumSpinner = new JSpinner();
+		panel.add(minimumSpinner, "4, 2");
+		minimumSpinner.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
+
+		lblMaximumSubsegmentLength = new JLabel("Maximum subsegment length");
+		panel.add(lblMaximumSubsegmentLength, "2, 4");
+
+		maximumSpinner = new JSpinner();
+		panel.add(maximumSpinner, "4, 4");
+
+		JPanel panel_1 = new JPanel();
+		panel_1.setBorder(new TitledBorder(null, "Suggestion ranking options", TitledBorder.LEADING, TitledBorder.TOP,
+				null, null));
+		panel_1.setBounds(12, 100, 583, 213);
+		panel_preferences.add(panel_1);
+		panel_1.setLayout(new FormLayout(
+				new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC,
+						FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+				new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
+						FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, }));
+
+		JLabel lblMaximumNumberOf = new JLabel("Maximum number of suggestions");
+		panel_1.add(lblMaximumNumberOf, "2, 2");
+
+		maxSuggestionsSpinner = new JSpinner();
+		panel_1.add(maxSuggestionsSpinner, "4, 2, right, default");
+
+		rdbtnHeuristicRanker = new JRadioButton("Heuristic ranker");
+		panel_1.add(rdbtnHeuristicRanker, "2, 4");
+
+		rdbtnNeuralNetworkRanker = new JRadioButton("Neural network ranker");
+		panel_1.add(rdbtnNeuralNetworkRanker, "2, 6");
+
+		JLabel lblNeuralNetworkFile = new JLabel("Neural network file");
+		panel_1.add(lblNeuralNetworkFile, "2, 8");
+
+		JPanel panel_2 = new JPanel();
+		panel_1.add(panel_2, "4, 8, fill, fill");
+		panel_2.setLayout(new FormLayout(
+				new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
+						FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC, },
+				new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, }));
+
+		textField = new JTextField();
+		panel_2.add(textField, "2, 2, fill, default");
+		textField.setColumns(10);
+
+		button = new JButton("...");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				FileDialog fd = new FileDialog(
+						(Frame) SwingUtilities.getWindowAncestor(SwingUtilities.getWindowAncestor(contentPanel)));
+				if (!"".equals(textField.getText())) {
+					fd.setDirectory(textField.getText().replaceAll("/[^/]*$", ""));
+					System.out.println("PATH " + textField.getText().replaceAll("/[^/]*$", ""));
+				}
+				fd.setVisible(true);
+				if (fd.getFile() != null) {
+					textField.setText(fd.getDirectory() + fd.getFile());
+				}
+			}
+		});
+		panel_2.add(button, "4, 2");
+
+		panel_internal = new JPanel();
+		tabbedPane.addTab("OmegaT MT", null, panel_internal, null);
+		panel_internal.setLayout(new BorderLayout(0, 0));
+
+		list = new JCheckBoxList();
+		list.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		panel_internal.add(list);
+
+		radio = new ButtonGroup();
+		radio.add(rdbtnNeuralNetworkRanker);
+		radio.add(rdbtnHeuristicRanker);
 
 		init();
 	}
@@ -156,8 +232,21 @@ public class ForecatPreferencesDialog extends JDialog {
 	private void init() {
 		getOmegaTMT();
 
-		minimumSpinner.setValue(Integer.parseInt(Preferences.getPreference(ForecatPreferences.FORECAT_MINIMUM_SUBSEGMENT_LENGTH)));
-		maximumSpinner.setValue(Integer.parseInt(Preferences.getPreference(ForecatPreferences.FORECAT_MAXIMUM_SUBSEGMENT_LENGTH)));
+		minimumSpinner.setValue(
+				Integer.parseInt(Preferences.getPreference(ForecatPreferences.FORECAT_MINIMUM_SUBSEGMENT_LENGTH)));
+		maximumSpinner.setValue(
+				Integer.parseInt(Preferences.getPreference(ForecatPreferences.FORECAT_MAXIMUM_SUBSEGMENT_LENGTH)));
+
+		maxSuggestionsSpinner
+				.setValue(Integer.parseInt(Preferences.getPreference(ForecatPreferences.FORECAT_MAXIMUM_SUGGESTIONS)));
+
+		if ("neural".equals(Preferences.getPreference(ForecatPreferences.FORECAT_SUGGESTION_RANKER))) {
+			rdbtnNeuralNetworkRanker.setSelected(true);
+		} else {
+			rdbtnHeuristicRanker.setSelected(true);
+		}
+
+		textField.setText(Preferences.getPreference(ForecatPreferences.FORECAT_ANN_FILE));
 	}
 
 	protected void getOmegaTMT() {
@@ -235,6 +324,18 @@ public class ForecatPreferencesDialog extends JDialog {
 		Preferences.setPreference(ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES, aux.toString());
 		Preferences.setPreference(ForecatPreferences.FORECAT_MINIMUM_SUBSEGMENT_LENGTH, minimumSpinner.getValue());
 		Preferences.setPreference(ForecatPreferences.FORECAT_MAXIMUM_SUBSEGMENT_LENGTH, maximumSpinner.getValue());
+		Preferences.setPreference(ForecatPreferences.FORECAT_MAXIMUM_SUGGESTIONS, maxSuggestionsSpinner.getValue());
+		
+		if (rdbtnNeuralNetworkRanker.isSelected())
+		{
+			Preferences.setPreference(ForecatPreferences.FORECAT_SUGGESTION_RANKER, "neural");
+		}
+		else if (rdbtnHeuristicRanker.isSelected())
+		{
+			Preferences.setPreference(ForecatPreferences.FORECAT_SUGGESTION_RANKER, "heuristic");
+		}
+		Preferences.setPreference(ForecatPreferences.FORECAT_ANN_FILE, textField.getText());
+
 		ForecatPreferences.init();
 	}
 }

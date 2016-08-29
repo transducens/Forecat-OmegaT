@@ -3,6 +3,7 @@ package org.miniforecat.ranker;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.miniforecat.suggestions.SuggestionsInput;
 import org.miniforecat.suggestions.SuggestionsOutput;
 
 /**
@@ -27,7 +28,7 @@ public class RankerComposite extends RankerShared {
 	}
 
 	@Override
-	public List<SuggestionsOutput> rankerService(RankerInput rankInp, List<SuggestionsOutput> input){
+	public List<SuggestionsOutput> rankerService(SuggestionsInput rankInp, List<SuggestionsOutput> input) {
 		ArrayList<SuggestionsOutput> outputSuggestionsList = new ArrayList<SuggestionsOutput>();
 
 		// Only the last ranker should limit the number of suggestions to be shown
