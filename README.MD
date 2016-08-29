@@ -2,7 +2,7 @@ Forecat plugin for OmegaT
 
 Includes code from [fannj](https://github.com/krenfro/fannj)
 
-Compil with 
+Compile with 
 
 ```
 ant jar
