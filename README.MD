@@ -8,7 +8,7 @@ Compile with
 ant jar
 ```
 
-And copy build/jar/forecat-omegat.jar and the contents of lib into the plugins folder of OmegaT.
+(or download from the build folder) and copy build/jar/forecat-omegat.jar and the contents of lib into the plugins folder of OmegaT.
 
 ###OmegaT bug
 
@@ -42,3 +42,5 @@ with
 ```
     <forecat_suggestion_ranker>heuristic</forecat_suggestion_ranker>
 ```
+
+Instructions for building your own neural network models are coming soon.
