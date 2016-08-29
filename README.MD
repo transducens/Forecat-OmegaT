@@ -1,9 +1,3 @@
 Forecat plugin for OmegaT
 
-
-Dependencies:
-```
-	commons-lang-2.4.jar
-	json.jar
-	forms-1.3.0.jar
-```	
+Includes code from [fannj](https://github.com/krenfro/fannj)
