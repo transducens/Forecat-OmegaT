@@ -4,7 +4,7 @@ Includes code from [fannj](https://github.com/krenfro/fannj)
 
 ###OmegaT bug
 
-In the last stable version (3.6.0.2) of [OmegaT](https://sourceforge.net/projects/omegat/) there is a bug that prevents the correct rendering of the suggestions on the Autocomplete popup. A temporal workaround (that breaks the rest of autocompleters) can be achieved patching Autocompleter.java with the following code
+In the last stable version (3.6.0.2) of [OmegaT](https://sourceforge.net/projects/omegat/) there is a bug that prevents the correct rendering of the suggestions on the Autocomplete popup. A temporary workaround (that breaks the rest of autocompleters) can be achieved patching Autocompleter.java with the following code
 
 ```
 	@Override
