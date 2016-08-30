@@ -27,6 +27,7 @@ import org.omegat.gui.exttrans.MachineTranslateTextArea;
 import org.omegat.util.Preferences;
 
 import com.jgoodies.forms.layout.FormLayout;
+import com.googlecode.fannj.Fann;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 
@@ -64,6 +65,7 @@ public class ForecatPreferencesDialog extends JDialog {
 	private JRadioButton rdbtnHeuristicRanker;
 	private JRadioButton rdbtnNeuralNetworkRanker;
 	private ButtonGroup radio;
+	private JLabel lblNeuralNetworkFile;
 
 	/**
 	 * Launch the application.
@@ -183,7 +185,7 @@ public class ForecatPreferencesDialog extends JDialog {
 		rdbtnNeuralNetworkRanker = new JRadioButton("Neural network ranker");
 		panel_1.add(rdbtnNeuralNetworkRanker, "2, 6");
 
-		JLabel lblNeuralNetworkFile = new JLabel("Neural network file");
+		lblNeuralNetworkFile = new JLabel("Neural network file");
 		panel_1.add(lblNeuralNetworkFile, "2, 8");
 
 		JPanel panel_2 = new JPanel();
@@ -247,6 +249,13 @@ public class ForecatPreferencesDialog extends JDialog {
 		}
 
 		textField.setText(Preferences.getPreference(ForecatPreferences.FORECAT_ANN_FILE));
+
+		if (!Fann.hasFann()) {
+			rdbtnNeuralNetworkRanker.setEnabled(false);
+			rdbtnHeuristicRanker.setSelected(true);
+			textField.setEnabled(false);
+			lblNeuralNetworkFile.setEnabled(false);
+		}
 	}
 
 	protected void getOmegaTMT() {
@@ -276,7 +285,6 @@ public class ForecatPreferencesDialog extends JDialog {
 					}
 					model.addElement(jb);
 				}
-				// System.out.println(getNameMethod.invoke(m));
 			}
 			list.setModel(model);
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
@@ -325,13 +333,10 @@ public class ForecatPreferencesDialog extends JDialog {
 		Preferences.setPreference(ForecatPreferences.FORECAT_MINIMUM_SUBSEGMENT_LENGTH, minimumSpinner.getValue());
 		Preferences.setPreference(ForecatPreferences.FORECAT_MAXIMUM_SUBSEGMENT_LENGTH, maximumSpinner.getValue());
 		Preferences.setPreference(ForecatPreferences.FORECAT_MAXIMUM_SUGGESTIONS, maxSuggestionsSpinner.getValue());
-		
-		if (rdbtnNeuralNetworkRanker.isSelected())
-		{
+
+		if (rdbtnNeuralNetworkRanker.isSelected()) {
 			Preferences.setPreference(ForecatPreferences.FORECAT_SUGGESTION_RANKER, "neural");
-		}
-		else if (rdbtnHeuristicRanker.isSelected())
-		{
+		} else if (rdbtnHeuristicRanker.isSelected()) {
 			Preferences.setPreference(ForecatPreferences.FORECAT_SUGGESTION_RANKER, "heuristic");
 		}
 		Preferences.setPreference(ForecatPreferences.FORECAT_ANN_FILE, textField.getText());

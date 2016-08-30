@@ -84,16 +84,29 @@ public class Fann {
 	static FannLibrary fannLib;
 
 	static {
-		NativeLibrary fann;
-		if (Platform.isWindows()) {
-			fann = NativeLibrary.getInstance("fannfloat");
-			Map options = fann.getOptions();
-			options.put(Library.OPTION_CALLING_CONVENTION, StdCallLibrary.STDCALL_CONVENTION);
-			options.put(Library.OPTION_FUNCTION_MAPPER, new WindowsFunctionMapper());
-		} else {
-			fann = NativeLibrary.getInstance("libfann");
+		// NativeLibrary fann;
+		// if (Platform.isWindows()) {
+		// fann = NativeLibrary.getInstance("fannfloat");
+		// Map options = fann.getOptions();
+		// options.put(Library.OPTION_CALLING_CONVENTION,
+		// StdCallLibrary.STDCALL_CONVENTION);
+		// options.put(Library.OPTION_FUNCTION_MAPPER, new
+		// WindowsFunctionMapper());
+		// } else {
+		// fann = NativeLibrary.getInstance("libfann");
+		// }
+		// fannLib = (FannLibrary) Native.loadLibrary("libfann",
+		// FannLibrary.class);
+	}
+
+	public static boolean hasFann() {
+		try {
+			fannLib = (FannLibrary) Native.loadLibrary("libfann", FannLibrary.class);
+			return true;
+		} catch (Exception | Error e) {
+			e.printStackTrace();
+			return false;
 		}
-		fannLib = (FannLibrary) Native.loadLibrary("libfann", FannLibrary.class);
 	}
 
 	protected Pointer ann;
@@ -107,6 +120,7 @@ public class Fann {
 	 * @param file
 	 */
 	public Fann(String file) {
+		hasFann();
 		ann = fannLib.fann_create_from_file(file);
 	}
 
