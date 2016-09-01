@@ -44,6 +44,7 @@ import com.jgoodies.forms.layout.FormSpecs;
 import javax.swing.border.TitledBorder;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.JSplitPane;
 
 public class ForecatPreferencesDialog extends JDialog {
 
@@ -135,13 +136,12 @@ public class ForecatPreferencesDialog extends JDialog {
 
 		panel_preferences = new JPanel();
 		tabbedPane.addTab("General options", null, panel_preferences, null);
-		panel_preferences.setLayout(null);
+		panel_preferences.setLayout(new BorderLayout(0, 0));
 
 		JPanel panel = new JPanel();
 		panel.setBorder(
 				new TitledBorder(null, "Segmentation options", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel.setBounds(12, 12, 583, 76);
-		panel_preferences.add(panel);
+		panel_preferences.add(panel, BorderLayout.NORTH);
 		panel.setLayout(new FormLayout(
 				new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow(9)"),
 						FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
@@ -152,20 +152,19 @@ public class ForecatPreferencesDialog extends JDialog {
 		panel.add(lblMinimumSubsegmentLength, "2, 2");
 
 		minimumSpinner = new JSpinner();
-		panel.add(minimumSpinner, "4, 2");
+		panel.add(minimumSpinner, "4, 2, right, default");
 		minimumSpinner.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
 
 		lblMaximumSubsegmentLength = new JLabel("Maximum subsegment length");
 		panel.add(lblMaximumSubsegmentLength, "2, 4");
 
 		maximumSpinner = new JSpinner();
-		panel.add(maximumSpinner, "4, 4");
+		panel.add(maximumSpinner, "4, 4, right, default");
 
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(null, "Suggestion ranking options", TitledBorder.LEADING, TitledBorder.TOP,
 				null, null));
-		panel_1.setBounds(12, 100, 583, 213);
-		panel_preferences.add(panel_1);
+		panel_preferences.add(panel_1, BorderLayout.CENTER);
 		panel_1.setLayout(new FormLayout(
 				new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC,
 						FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
@@ -189,6 +188,7 @@ public class ForecatPreferencesDialog extends JDialog {
 		panel_1.add(lblNeuralNetworkFile, "2, 8");
 
 		JPanel panel_2 = new JPanel();
+		panel_2.setBorder(null);
 		panel_1.add(panel_2, "4, 8, fill, fill");
 		panel_2.setLayout(new FormLayout(
 				new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
