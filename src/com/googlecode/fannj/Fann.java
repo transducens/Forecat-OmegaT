@@ -104,7 +104,7 @@ public class Fann {
 			fannLib = (FannLibrary) Native.loadLibrary("libfann", FannLibrary.class);
 			return true;
 		} catch (Exception | Error e) {
-			e.printStackTrace();
+			System.out.println("FANN static library has not been found.");
 			return false;
 		}
 	}

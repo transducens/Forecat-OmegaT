@@ -144,7 +144,7 @@ public class TranslationServerSide {
 			}
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
 				| NoSuchMethodException | InvocationTargetException e) {
-			e.printStackTrace();
+			System.out.println("Forecat error: querying OmegaT engines " + e.getMessage());
 		}
 
 		return ret;
@@ -177,12 +177,14 @@ public class TranslationServerSide {
 				@SuppressWarnings("unchecked")
 				List<String> translations = (List<String>) m.invoke(im, sLang, tLang, segments);
 				for (int i = 0; i < sourceSegments.size(); i++) {
-					
-					/*	Only remove the capitalization of the first letter if a word starts in capital. 
-					 * 	If the second word is capitalized, we suppose its an acronym
+
+					/*
+					 * Only remove the capitalization of the first letter if a
+					 * word starts in capital. If the second word is
+					 * capitalized, we suppose its an acronym
 					 * 
 					 */
-					
+
 					String casedTranslation = translations.get(i);
 					if (casedTranslation.length() > 1) {
 						if (Character.isUpperCase(casedTranslation.charAt(0))
@@ -197,29 +199,29 @@ public class TranslationServerSide {
 			} catch (IllegalArgumentException | NoSuchMethodException | SecurityException | IllegalAccessException
 					| InvocationTargetException e) {
 				// Else, translate segment by segment
-				e.printStackTrace();
-				e.getCause().printStackTrace();
+				// e.printStackTrace();
+				// e.getCause().printStackTrace();
 				try {
 					enabledField = BaseTranslate.class.getDeclaredField("enabled");
 					enabledField.setAccessible(true);
 					oldEnabledField = enabledField.getBoolean(im);
 					enabledField.set(((BaseTranslate) im), true);
 				} catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException ex) {
-					ex.printStackTrace();
+					System.out.println("Forecat error: querying OmegaT engines " + ex.getMessage());
 				}
 
 				for (SourceSegment ss : sourceSegments) {
 					try {
 						translation = im.getTranslation(sLang, tLang, ss.getSourceSegmentText());
-					} catch (Exception e1) {
-						e1.printStackTrace();
+					} catch (Exception ex) {
+						System.out.println("Forecat error: querying OmegaT engines " + ex.getMessage());
 					}
 					addSegments(segmentPairs, segmentCounts, translation.toLowerCase(), "OmegaTMT", ss);
 				}
 				try {
 					enabledField.set(((BaseTranslate) im), oldEnabledField);
 				} catch (IllegalArgumentException | IllegalAccessException ex) {
-					ex.printStackTrace();
+					System.out.println("Forecat error: querying OmegaT engines " + ex.getMessage());
 				}
 			}
 		}

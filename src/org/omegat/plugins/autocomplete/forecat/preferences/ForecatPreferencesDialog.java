@@ -77,7 +77,7 @@ public class ForecatPreferencesDialog extends JDialog {
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Forecat error: showing preferences " + e.getMessage());
 		}
 	}
 
@@ -289,7 +289,7 @@ public class ForecatPreferencesDialog extends JDialog {
 			list.setModel(model);
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
 				| NoSuchMethodException | InvocationTargetException e) {
-			e.printStackTrace();
+			System.out.println("Forecat error: getting OmegaT MT engines " + e.getMessage());
 		}
 	}
 

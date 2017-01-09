@@ -4,6 +4,8 @@ import org.omegat.util.Language;
 
 public class BaseTranslate {
 
+	protected boolean enabled;
+	
 	protected String getPreferenceName() {
 		// TODO Auto-generated method stub
 		return null;

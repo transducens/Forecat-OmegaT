@@ -38,6 +38,11 @@ public class ForecatPTS extends BaseTranslate {
 	private static int maxSegmentLength = 4;
 	private static int minSegmentLength = 1;
 
+	public static boolean isEnabled()
+	{
+		return self.enabled;
+	}
+	
 	public static void useSuggestion(AutoCompleterItem item) {
 		if (item != null) {
 			// System.out.println(item.extras[1]);

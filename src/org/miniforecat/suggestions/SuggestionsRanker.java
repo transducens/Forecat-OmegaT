@@ -21,7 +21,7 @@ public class SuggestionsRanker extends SuggestionsShared {
 		try {
 			output = ranker.rankerService(input, output);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Forecat error: obtainSuggestions");
 		}
 		return output;
 	}

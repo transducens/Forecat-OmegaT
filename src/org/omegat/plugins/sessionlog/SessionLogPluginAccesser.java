@@ -24,7 +24,7 @@ public class SessionLogPluginAccesser {
 					Method m = c.getMethod("getLogger", null);
 					logPluginCache = (BaseLogger) m.invoke(null, null);
 				} catch (Exception ex) {
-					ex.printStackTrace();
+					System.out.println("LogPlugin access error: not found " + ex.getMessage());
 				}
 			}
 		}

@@ -65,9 +65,7 @@ public class ForecatMiniInterface extends IForecatInterface {
 		try {
 			outputLanguagesList = languages.languagesService(inputLanguagesList, session);
 		} catch (BboxcatException e) {
-			e.printStackTrace();
-			System.err.println(e.getMessage());
-			System.exit(1);
+			System.out.println("Forecat error: getting languages " + e.getMessage());
 		}
 		return outputLanguagesList;
 	}
@@ -81,11 +79,9 @@ public class ForecatMiniInterface extends IForecatInterface {
 			logTranslate(session);
 
 		} catch (BboxcatException e) {
-			e.printStackTrace();
-			System.err.println(e.getMessage());
-			System.exit(1);
+			System.out.println("Forecat error: translating " + e.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Forecat error: translating " + e.getMessage());
 			outputTranslation = new TranslationOutput(0, 0);
 		}
 		return outputTranslation;
@@ -99,9 +95,7 @@ public class ForecatMiniInterface extends IForecatInterface {
 					session);
 			logSuggestions(session, inputSuggestions, outputSuggestionsList);
 		} catch (BboxcatException e) {
-			e.printStackTrace();
-			System.err.println(e.getMessage());
-			System.exit(1);
+			System.out.println("Forecat error: getting suggestions " + e.getMessage());
 		}
 		return outputSuggestionsList;
 	}
@@ -113,9 +107,7 @@ public class ForecatMiniInterface extends IForecatInterface {
 			outputSelection = selection.selectionService(inputSelection, session);
 			logSelect(session, inputSelection, outputSelection);
 		} catch (BboxcatException e) {
-			e.printStackTrace();
-			System.err.println(e.getMessage());
-			System.exit(1);
+			System.out.println("Forecat error: perforing selection " + e.getMessage());
 		}
 		return outputSelection;
 	}

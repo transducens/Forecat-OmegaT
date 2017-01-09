@@ -75,6 +75,10 @@ public class ForecatAutoCompleteView extends AutoCompleterListView {
 	@Override
 	public List<AutoCompleterItem> computeListData(String prevText, boolean contextualOnly) {
 
+		if (!ForecatPTS.isEnabled()) {
+			return new ArrayList<AutoCompleterItem>();
+		}
+
 		int currentSegmentStart = prevText.length() - 1;
 		int numWords = StringUtils.countMatches(prevText, " ");
 		int index = 0;
@@ -131,6 +135,11 @@ public class ForecatAutoCompleteView extends AutoCompleterListView {
 		ArrayList<AutoCompleterItem> newEntryList = new ArrayList<AutoCompleterItem>();
 		AutoCompleterItem ac;
 		int selectedIndex = getList().getSelectedIndex(), i, j;
+
+		if (lastResult == null) {
+			return;
+		}
+
 		for (i = 0; i < lastResult.size(); i++) {
 			ac = lastResult.get(i);
 			if (i == itemBeingTabbed) {
