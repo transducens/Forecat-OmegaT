@@ -7,9 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -21,9 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
-import org.omegat.core.Core;
+import org.omegat.core.machinetranslators.MachineTranslators;
 import org.omegat.gui.exttrans.IMachineTranslation;
-import org.omegat.gui.exttrans.MachineTranslateTextArea;
 import org.omegat.util.Preferences;
 
 import com.jgoodies.forms.layout.FormLayout;
@@ -259,38 +256,26 @@ public class ForecatPreferencesDialog extends JDialog {
 	}
 
 	protected void getOmegaTMT() {
-		IMachineTranslation mt[];
-		MachineTranslateTextArea mtta = Core.getMachineTranslatePane();
-		Field f;
+		List<IMachineTranslation> mt;
 		String enabled = Preferences.getPreference(ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES);
 		String ignore = Preferences.getPreference(ForecatPreferences.FORECAT_IGNORE_OMEGAT_ENGINES);
 
-		try {
-			f = MachineTranslateTextArea.class.getDeclaredField("translators");
-			f.setAccessible(true);
-			mt = (IMachineTranslation[]) f.get(mtta);
-
-			Method getNameMethod = IMachineTranslation.class.getDeclaredMethod("getName");
-			getNameMethod.setAccessible(true);
-
-			DefaultListModel<JCheckBox> model = new DefaultListModel<JCheckBox>();
-			for (IMachineTranslation m : mt) {
-				String nameMethod = getNameMethod.invoke(m).toString();
-				if (!ignore.contains(":" + nameMethod.replace(":", ";") + ":")) {
-					JCheckBox jb = new JCheckBox(nameMethod);
-					if (enabled.contains(":" + nameMethod.replace(":", ";") + ":")) {
-						jb.setSelected(true);
-					} else {
-						jb.setSelected(false);
-					}
-					model.addElement(jb);
+		mt = MachineTranslators.getMachineTranslators();
+		DefaultListModel<JCheckBox> model = new DefaultListModel<JCheckBox>();
+		for (IMachineTranslation m : mt) {
+			String nameMethod = m.getName();
+			if (!ignore.contains(":" + nameMethod.replace(":", ";") + ":")) {
+				JCheckBox jb = new JCheckBox(nameMethod);
+				if (enabled.contains(":" + nameMethod.replace(":", ";") + ":")) {
+					jb.setSelected(true);
+				} else {
+					jb.setSelected(false);
 				}
+				model.addElement(jb);
 			}
-			list.setModel(model);
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
-				| NoSuchMethodException | InvocationTargetException e) {
-			System.out.println("Forecat error: getting OmegaT MT engines " + e.getMessage());
 		}
+		list.setModel(model);
+
 	}
 
 	protected String getOkButtonText() {
