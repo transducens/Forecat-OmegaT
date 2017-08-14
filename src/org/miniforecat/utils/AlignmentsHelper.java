@@ -46,6 +46,12 @@ public class AlignmentsHelper {
 		Map<String, List<SourceSegment>> segmentPairs = (Map<String, List<SourceSegment>>) IForecatInterface
 				.getSession().getAttribute("segmentPairs");
 		
+		if (segmentPairs == null)
+		{
+			System.out.println("FORECAT ERROR: NO SEGMENTPAIRS");
+			return;
+		}
+		
 		typedSplit = target.substring(0, currentChar).split(" ");
 		
 //		System.out.println("TARGET " + targetWords + " SOURCE " + sourceWords + " TYPEDSPLIT " + typedSplit.length);

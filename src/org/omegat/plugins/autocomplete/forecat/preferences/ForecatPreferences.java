@@ -9,19 +9,27 @@ import org.omegat.plugins.autocomplete.forecat.adapter.ForecatWebServiceInterfac
 import org.omegat.plugins.autocomplete.forecat.adapter.IForecatInterface;
 import org.omegat.util.Preferences;
 
+import com.googlecode.fannj.Fann;
+
 public class ForecatPreferences {
 
-	public static String FORECAT_ENABLED_OMEGAT_ENGINES = "forecat_enabled_omegat_mt";
-	public static String FORECAT_IGNORE_OMEGAT_ENGINES = "forecat_ignore_omegat_mt";
+	public static final String FORECAT_THRESHOLD = "forecat_threshold";
+	public static final String FORECAT_ABSOLUTE_AVG = "forecat_absolute_avg";
+	public static final String FORECAT_ABSOLUTE_STDEV = "forecat_absolute_stdev";
+	public static final String FORECAT_RELATIVE_AVG = "forecat_relative_avg";
+	public static final String FORECAT_RELATIVE_STDEV = "forecat_relative_stdev";
 
-	public static String FORECAT_USE_API = "forecat_use_api";
-	public static String FORECAT_API_URL = "forecat_api_url";
+	public static final String FORECAT_ENABLED_OMEGAT_ENGINES = "forecat_enabled_omegat_mt";
+	public static final String FORECAT_IGNORE_OMEGAT_ENGINES = "forecat_ignore_omegat_mt";
 
-	public static String FORECAT_MINIMUM_SUBSEGMENT_LENGTH = "forecat_minimum_subsegment_length";
-	public static String FORECAT_MAXIMUM_SUBSEGMENT_LENGTH = "forecat_maximum_subsegment_length";
-	public static String FORECAT_MAXIMUM_SUGGESTIONS = "forecat_maximum_suggestions";
-	public static String FORECAT_SUGGESTION_RANKER = "forecat_suggestion_ranker";
-	public static String FORECAT_ANN_FILE = "forecat_ann_file";
+	public static final String FORECAT_USE_API = "forecat_use_api";
+	public static final String FORECAT_API_URL = "forecat_api_url";
+
+	public static final String FORECAT_MINIMUM_SUBSEGMENT_LENGTH = "forecat_minimum_subsegment_length";
+	public static final String FORECAT_MAXIMUM_SUBSEGMENT_LENGTH = "forecat_maximum_subsegment_length";
+	public static final String FORECAT_MAXIMUM_SUGGESTIONS = "forecat_maximum_suggestions";
+	public static final String FORECAT_SUGGESTION_RANKER = "forecat_suggestion_ranker";
+	public static final String FORECAT_ANN_FILE = "forecat_ann_file";
 
 	public static void populate() {
 		if (!Preferences.existsPreference(FORECAT_ENABLED_OMEGAT_ENGINES))
@@ -38,6 +46,17 @@ public class ForecatPreferences {
 			Preferences.setPreference(FORECAT_MINIMUM_SUBSEGMENT_LENGTH, 1);
 		if (!Preferences.existsPreference(FORECAT_MAXIMUM_SUBSEGMENT_LENGTH))
 			Preferences.setPreference(FORECAT_MAXIMUM_SUBSEGMENT_LENGTH, 4);
+		if (!Preferences.existsPreference(FORECAT_THRESHOLD))
+			Preferences.setPreference(FORECAT_THRESHOLD, -1);
+
+		if (!Preferences.existsPreference(FORECAT_ABSOLUTE_AVG))
+			Preferences.setPreference(FORECAT_ABSOLUTE_AVG, 0);
+		if (!Preferences.existsPreference(FORECAT_ABSOLUTE_STDEV))
+			Preferences.setPreference(FORECAT_ABSOLUTE_STDEV, 1);
+		if (!Preferences.existsPreference(FORECAT_RELATIVE_AVG))
+			Preferences.setPreference(FORECAT_RELATIVE_AVG, 0);
+		if (!Preferences.existsPreference(FORECAT_RELATIVE_STDEV))
+			Preferences.setPreference(FORECAT_RELATIVE_STDEV, 1);
 
 		if (!Preferences.existsPreference(FORECAT_MAXIMUM_SUGGESTIONS))
 			Preferences.setPreference(FORECAT_MAXIMUM_SUGGESTIONS, 4);
@@ -60,14 +79,26 @@ public class ForecatPreferences {
 
 		ForecatPTS.setMinSegmentLength(Integer.parseInt(Preferences.getPreference(FORECAT_MINIMUM_SUBSEGMENT_LENGTH)));
 		ForecatPTS.setMaxSegmentLength(Integer.parseInt(Preferences.getPreference(FORECAT_MAXIMUM_SUBSEGMENT_LENGTH)));
+		RankerShared.setThreshold(Float.parseFloat(Preferences.getPreference(FORECAT_THRESHOLD)));
 		RankerShared.setMaxSuggestions(Integer.parseInt(Preferences.getPreference(FORECAT_MAXIMUM_SUGGESTIONS)));
 
+		RankerNeuralNetwork.diffAvg = Float.parseFloat(Preferences.getPreference(FORECAT_ABSOLUTE_AVG));
+		RankerNeuralNetwork.diffDev = Float.parseFloat(Preferences.getPreference(FORECAT_ABSOLUTE_STDEV));
+		RankerNeuralNetwork.ratioAvg = Float.parseFloat(Preferences.getPreference(FORECAT_RELATIVE_AVG));
+		RankerNeuralNetwork.ratioDev = Float.parseFloat(Preferences.getPreference(FORECAT_RELATIVE_STDEV));
+
+		if (!Fann.hasFann())
+		{
+			Preferences.setPreference(FORECAT_SUGGESTION_RANKER, "heuristic");
+		}
+		
 		if ("neural".equals(Preferences.getPreference(FORECAT_SUGGESTION_RANKER))) {
 			IForecatInterface.getForecatInterface().useNeural();
+			RankerNeuralNetwork.setAnnFile(Preferences.getPreference(FORECAT_ANN_FILE));
+			RankerNeuralNetwork.init();
 		} else if ("heuristic".equals(Preferences.getPreference(FORECAT_SUGGESTION_RANKER))) {
 			IForecatInterface.getForecatInterface().useHeuristic();
 		}
 
-		RankerNeuralNetwork.setAnnFile(Preferences.getPreference(FORECAT_ANN_FILE));
 	}
 }

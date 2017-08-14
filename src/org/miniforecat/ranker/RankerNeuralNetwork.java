@@ -15,13 +15,18 @@ public class RankerNeuralNetwork extends RankerPressureBasic {
 	private static Fann ann;
 	private static String annFile;
 
-	private static float diffAvg = 0;
-	private static float diffDev = 1;
-	private static float ratioAvg = 0;
-	private static float ratioDev = 1;
+	public static float diffAvg = 0;
+	public static float diffDev = 1;
+	public static float ratioAvg = 0;
+	public static float ratioDev = 1;
 
 	public RankerNeuralNetwork() {
-		 ann = new Fann(getAnnFile());
+		init();
+	}
+	
+	public static void init()
+	{
+		ann = new Fann(getAnnFile());
 	}
 
 	public static void setDiffAvg(float da) {
@@ -490,14 +495,20 @@ public class RankerNeuralNetwork extends RankerPressureBasic {
 
 			nnScore = ann.run(features)[0];
 			so.setSuggestionFeasibility(nnScore);
-			System.out.println(so.getSuggestionText() + " " + nnScore);
+//			System.out.println(so.getSuggestionText() + " " + nnScore);
 		}
 
 		Quicksort q = new Quicksort();
+		SuggestionsOutput so;
 		q.sort(sortList, input);
 
 		for (index = 0; index < maxSuggestions && index < input.size(); index++) {
-			outputSuggestionsList.add(input.get(sortList.get(sortList.size() - index - 1)));
+			so = input.get(sortList.get(sortList.size() - index - 1));
+			
+			if (so.getSuggestionFeasibility() < threshold)
+				break;
+			
+			outputSuggestionsList.add(so);
 		}
 
 		return outputSuggestionsList;

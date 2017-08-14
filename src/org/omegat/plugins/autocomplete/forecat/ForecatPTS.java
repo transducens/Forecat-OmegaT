@@ -139,4 +139,5 @@ public class ForecatPTS extends BaseTranslate {
 	public static void setMinSegmentLength(int msl) {
 		minSegmentLength = msl;
 	}
+
 }

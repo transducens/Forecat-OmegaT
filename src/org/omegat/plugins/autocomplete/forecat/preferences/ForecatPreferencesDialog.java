@@ -7,7 +7,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -19,8 +21,9 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
-import org.omegat.core.machinetranslators.MachineTranslators;
+import org.omegat.core.Core;
 import org.omegat.gui.exttrans.IMachineTranslation;
+import org.omegat.gui.exttrans.MachineTranslateTextArea;
 import org.omegat.util.Preferences;
 
 import com.jgoodies.forms.layout.FormLayout;
@@ -42,6 +45,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.JSplitPane;
+import java.awt.Font;
 
 public class ForecatPreferencesDialog extends JDialog {
 
@@ -64,6 +68,21 @@ public class ForecatPreferencesDialog extends JDialog {
 	private JRadioButton rdbtnNeuralNetworkRanker;
 	private ButtonGroup radio;
 	private JLabel lblNeuralNetworkFile;
+	private JLabel lblThreshold;
+	private JSpinner thresholdSpinner;
+	private JPanel panel_3;
+	private JLabel lblAbsoluteDifference;
+	private JPanel panel_4;
+	private JLabel lblAverage;
+	private JLabel lblStdev;
+	private JSpinner absAvgSpinner;
+	private JSpinner absStdevSpinner;
+	private JLabel lblRelativeDifference;
+	private JPanel panel_5;
+	private JLabel lblAverage_1;
+	private JLabel lblStdev_1;
+	private JSpinner relAvgSpinner;
+	private JSpinner relStdevSpinner;
 
 	/**
 	 * Launch the application.
@@ -143,20 +162,27 @@ public class ForecatPreferencesDialog extends JDialog {
 				new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow(9)"),
 						FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
 				new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
-						FormSpecs.DEFAULT_ROWSPEC, }));
+						FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, }));
 
 		lblMinimumSubsegmentLength = new JLabel("Minimum subsegment length");
 		panel.add(lblMinimumSubsegmentLength, "2, 2");
 
 		minimumSpinner = new JSpinner();
-		panel.add(minimumSpinner, "4, 2, right, default");
+		minimumSpinner.setFont(new Font("Dialog", Font.PLAIN, 12));
+		panel.add(minimumSpinner, "4, 2");
 		minimumSpinner.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
 
 		lblMaximumSubsegmentLength = new JLabel("Maximum subsegment length");
 		panel.add(lblMaximumSubsegmentLength, "2, 4");
 
 		maximumSpinner = new JSpinner();
-		panel.add(maximumSpinner, "4, 4, right, default");
+		panel.add(maximumSpinner, "4, 4");
+
+		JLabel lblMaximumNumberOf = new JLabel("Maximum number of suggestions");
+		panel.add(lblMaximumNumberOf, "2, 6");
+
+		maxSuggestionsSpinner = new JSpinner();
+		panel.add(maxSuggestionsSpinner, "4, 6");
 
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(null, "Suggestion ranking options", TitledBorder.LEADING, TitledBorder.TOP,
@@ -167,30 +193,29 @@ public class ForecatPreferencesDialog extends JDialog {
 						FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
 				new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
 						FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
-						FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, }));
+						FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, }));
 
-		JLabel lblMaximumNumberOf = new JLabel("Maximum number of suggestions");
-		panel_1.add(lblMaximumNumberOf, "2, 2");
-
-		maxSuggestionsSpinner = new JSpinner();
-		panel_1.add(maxSuggestionsSpinner, "4, 2, right, default");
-
+		
+		radio = new ButtonGroup();
 		rdbtnHeuristicRanker = new JRadioButton("Heuristic ranker");
-		panel_1.add(rdbtnHeuristicRanker, "2, 4");
+		panel_1.add(rdbtnHeuristicRanker, "2, 2");
+		radio.add(rdbtnHeuristicRanker);
 
 		rdbtnNeuralNetworkRanker = new JRadioButton("Neural network ranker");
-		panel_1.add(rdbtnNeuralNetworkRanker, "2, 6");
+		panel_1.add(rdbtnNeuralNetworkRanker, "2, 4");
+		radio.add(rdbtnNeuralNetworkRanker);
 
 		lblNeuralNetworkFile = new JLabel("Neural network file");
-		panel_1.add(lblNeuralNetworkFile, "2, 8");
+		panel_1.add(lblNeuralNetworkFile, "2, 6");
 
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(null);
-		panel_1.add(panel_2, "4, 8, fill, fill");
+		panel_1.add(panel_2, "4, 6, fill, fill");
 		panel_2.setLayout(new FormLayout(
 				new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
 						FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC, },
-				new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, }));
+				new RowSpec[] { FormSpecs.LABEL_COMPONENT_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, }));
 
 		textField = new JTextField();
 		panel_2.add(textField, "2, 2, fill, default");
@@ -213,6 +238,70 @@ public class ForecatPreferencesDialog extends JDialog {
 		});
 		panel_2.add(button, "4, 2");
 
+		lblThreshold = new JLabel("Threshold");
+		panel_1.add(lblThreshold, "2, 8");
+
+		panel_3 = new JPanel();
+		panel_1.add(panel_3, "4, 8, fill, fill");
+		panel_3.setLayout(new FormLayout(
+				new ColumnSpec[] { ColumnSpec.decode("default:grow(10)"), ColumnSpec.decode("default:grow"), },
+				new RowSpec[] { RowSpec.decode("20px"), }));
+
+		thresholdSpinner = new JSpinner();
+		thresholdSpinner.setModel(new SpinnerNumberModel(new Float(0), null, null, new Float(0.1)));
+		panel_3.add(thresholdSpinner, "2, 1, default, top");
+
+		lblAbsoluteDifference = new JLabel("Absolute difference");
+		panel_1.add(lblAbsoluteDifference, "2, 10");
+
+		panel_4 = new JPanel();
+		panel_1.add(panel_4, "4, 10, fill, fill");
+		panel_4.setLayout(new FormLayout(new ColumnSpec[] {
+				ColumnSpec.decode("default:grow(4)"),
+				ColumnSpec.decode("default:grow"),
+				FormSpecs.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("default:grow(4)"),
+				ColumnSpec.decode("default:grow"),},
+			new RowSpec[] {
+				FormSpecs.DEFAULT_ROWSPEC,}));
+
+		lblAverage = new JLabel("Average");
+		panel_4.add(lblAverage, "1, 1");
+
+		absAvgSpinner = new JSpinner();
+		absAvgSpinner.setModel(new SpinnerNumberModel(new Float(0), null, null, new Float(0.1)));
+		panel_4.add(absAvgSpinner, "2, 1");
+
+		lblStdev = new JLabel("StDev");
+		panel_4.add(lblStdev, "4, 1");
+
+		absStdevSpinner = new JSpinner();
+		absStdevSpinner.setModel(new SpinnerNumberModel(new Float(0), null, null, new Float(0.1)));
+		panel_4.add(absStdevSpinner, "5, 1");
+
+		lblRelativeDifference = new JLabel("Relative Difference");
+		panel_1.add(lblRelativeDifference, "2, 12");
+
+		panel_5 = new JPanel();
+		panel_1.add(panel_5, "4, 12, fill, fill");
+		panel_5.setLayout(new FormLayout(new ColumnSpec[] { ColumnSpec.decode("default:grow(4)"),
+				ColumnSpec.decode("default:grow"), FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow(4)"),
+				ColumnSpec.decode("default:grow"), }, new RowSpec[] { FormSpecs.DEFAULT_ROWSPEC, }));
+
+		lblAverage_1 = new JLabel("Average");
+		panel_5.add(lblAverage_1, "1, 1");
+
+		relAvgSpinner = new JSpinner();
+		relAvgSpinner.setModel(new SpinnerNumberModel(new Float(0), null, null, new Float(0.1)));
+		panel_5.add(relAvgSpinner, "2, 1");
+
+		lblStdev_1 = new JLabel("StDev");
+		panel_5.add(lblStdev_1, "4, 1");
+
+		relStdevSpinner = new JSpinner();
+		relStdevSpinner.setModel(new SpinnerNumberModel(new Float(0), null, null, new Float(0.1)));
+		panel_5.add(relStdevSpinner, "5, 1");
+
 		panel_internal = new JPanel();
 		tabbedPane.addTab("OmegaT MT", null, panel_internal, null);
 		panel_internal.setLayout(new BorderLayout(0, 0));
@@ -221,9 +310,7 @@ public class ForecatPreferencesDialog extends JDialog {
 		list.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		panel_internal.add(list);
 
-		radio = new ButtonGroup();
-		radio.add(rdbtnNeuralNetworkRanker);
-		radio.add(rdbtnHeuristicRanker);
+		
 
 		init();
 	}
@@ -246,36 +333,69 @@ public class ForecatPreferencesDialog extends JDialog {
 		}
 
 		textField.setText(Preferences.getPreference(ForecatPreferences.FORECAT_ANN_FILE));
+		thresholdSpinner.setValue(Float.parseFloat(Preferences.getPreference(ForecatPreferences.FORECAT_THRESHOLD)));
+
+		absAvgSpinner.setValue(Float.parseFloat(Preferences.getPreference(ForecatPreferences.FORECAT_ABSOLUTE_AVG)));
+		absStdevSpinner
+				.setValue(Float.parseFloat(Preferences.getPreference(ForecatPreferences.FORECAT_ABSOLUTE_STDEV)));
+		relAvgSpinner.setValue(Float.parseFloat(Preferences.getPreference(ForecatPreferences.FORECAT_RELATIVE_AVG)));
+		relStdevSpinner
+				.setValue(Float.parseFloat(Preferences.getPreference(ForecatPreferences.FORECAT_RELATIVE_STDEV)));
 
 		if (!Fann.hasFann()) {
 			rdbtnNeuralNetworkRanker.setEnabled(false);
 			rdbtnHeuristicRanker.setSelected(true);
 			textField.setEnabled(false);
 			lblNeuralNetworkFile.setEnabled(false);
+			lblThreshold.setEnabled(false);
+			thresholdSpinner.setEnabled(false);
+			
+			lblAbsoluteDifference.setEnabled(false);
+			lblAverage.setEnabled(false);
+			lblStdev.setEnabled(false);
+			absAvgSpinner.setEnabled(false);
+			absStdevSpinner.setEnabled(false);
+			lblRelativeDifference.setEnabled(false);
+			lblAverage_1.setEnabled(false);
+			lblStdev_1.setEnabled(false);
+			relAvgSpinner.setEnabled(false);
+			relStdevSpinner.setEnabled(false);
 		}
 	}
 
 	protected void getOmegaTMT() {
-		List<IMachineTranslation> mt;
+		IMachineTranslation mt[];
+		MachineTranslateTextArea mtta = Core.getMachineTranslatePane();
+		Field f;
 		String enabled = Preferences.getPreference(ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES);
 		String ignore = Preferences.getPreference(ForecatPreferences.FORECAT_IGNORE_OMEGAT_ENGINES);
 
-		mt = MachineTranslators.getMachineTranslators();
-		DefaultListModel<JCheckBox> model = new DefaultListModel<JCheckBox>();
-		for (IMachineTranslation m : mt) {
-			String nameMethod = m.getName();
-			if (!ignore.contains(":" + nameMethod.replace(":", ";") + ":")) {
-				JCheckBox jb = new JCheckBox(nameMethod);
-				if (enabled.contains(":" + nameMethod.replace(":", ";") + ":")) {
-					jb.setSelected(true);
-				} else {
-					jb.setSelected(false);
-				}
-				model.addElement(jb);
-			}
-		}
-		list.setModel(model);
+		try {
+			f = MachineTranslateTextArea.class.getDeclaredField("translators");
+			f.setAccessible(true);
+			mt = (IMachineTranslation[]) f.get(mtta);
 
+			Method getNameMethod = IMachineTranslation.class.getDeclaredMethod("getName");
+			getNameMethod.setAccessible(true);
+
+			DefaultListModel<JCheckBox> model = new DefaultListModel<JCheckBox>();
+			for (IMachineTranslation m : mt) {
+				String nameMethod = getNameMethod.invoke(m).toString();
+				if (!ignore.contains(":" + nameMethod.replace(":", ";") + ":")) {
+					JCheckBox jb = new JCheckBox(nameMethod);
+					if (enabled.contains(":" + nameMethod.replace(":", ";") + ":")) {
+						jb.setSelected(true);
+					} else {
+						jb.setSelected(false);
+					}
+					model.addElement(jb);
+				}
+			}
+			list.setModel(model);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
+				| NoSuchMethodException | InvocationTargetException e) {
+			System.out.println("Forecat error: getting OmegaT MT engines " + e.getMessage());
+		}
 	}
 
 	protected String getOkButtonText() {
@@ -319,12 +439,18 @@ public class ForecatPreferencesDialog extends JDialog {
 		Preferences.setPreference(ForecatPreferences.FORECAT_MAXIMUM_SUBSEGMENT_LENGTH, maximumSpinner.getValue());
 		Preferences.setPreference(ForecatPreferences.FORECAT_MAXIMUM_SUGGESTIONS, maxSuggestionsSpinner.getValue());
 
+		Preferences.setPreference(ForecatPreferences.FORECAT_ABSOLUTE_AVG, absAvgSpinner.getValue());
+		Preferences.setPreference(ForecatPreferences.FORECAT_ABSOLUTE_STDEV, absStdevSpinner.getValue());
+		Preferences.setPreference(ForecatPreferences.FORECAT_RELATIVE_AVG, relAvgSpinner.getValue());
+		Preferences.setPreference(ForecatPreferences.FORECAT_RELATIVE_STDEV, relStdevSpinner.getValue());
+
 		if (rdbtnNeuralNetworkRanker.isSelected()) {
 			Preferences.setPreference(ForecatPreferences.FORECAT_SUGGESTION_RANKER, "neural");
 		} else if (rdbtnHeuristicRanker.isSelected()) {
 			Preferences.setPreference(ForecatPreferences.FORECAT_SUGGESTION_RANKER, "heuristic");
 		}
 		Preferences.setPreference(ForecatPreferences.FORECAT_ANN_FILE, textField.getText());
+		Preferences.setPreference(ForecatPreferences.FORECAT_THRESHOLD, thresholdSpinner.getValue());
 
 		ForecatPreferences.init();
 	}
