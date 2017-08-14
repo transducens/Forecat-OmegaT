@@ -15,7 +15,6 @@ import org.miniforecat.utils.SubIdProvider;
 import org.miniforecat.utils.UtilsShared;
 import org.omegat.core.Core;
 import org.omegat.core.machinetranslators.BaseTranslate;
-import org.omegat.core.machinetranslators.MachineTranslators;
 import org.omegat.gui.exttrans.IMachineTranslation;
 import org.omegat.gui.exttrans.MachineTranslateTextArea;
 import org.omegat.plugins.autocomplete.forecat.preferences.ForecatPreferences;
@@ -121,20 +120,31 @@ public class TranslationServerSide {
 	public boolean showUnknown = false;
 
 	protected List<IMachineTranslation> getOmegaTMT() {
-		List<IMachineTranslation> mt;
+		IMachineTranslation mt[];
 		ArrayList<IMachineTranslation> ret = new ArrayList<IMachineTranslation>();
+		MachineTranslateTextArea mtta = Core.getMachineTranslatePane();
+		Field f;
+		try {
+			f = MachineTranslateTextArea.class.getDeclaredField("translators");
+			f.setAccessible(true);
+			mt = (IMachineTranslation[]) f.get(mtta);
 
-		mt = MachineTranslators.getMachineTranslators();
-
-		for (IMachineTranslation m : mt) {
-			String nameMethod = m.getName();
-			if (!Preferences.getPreference(ForecatPreferences.FORECAT_IGNORE_OMEGAT_ENGINES)
-					.contains(":" + nameMethod.replace(":", ";") + ":")) {
-				if (Preferences.getPreference(ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES)
+			Method getNameMethod = IMachineTranslation.class.getDeclaredMethod("getName");
+			getNameMethod.setAccessible(true);
+			for (IMachineTranslation m : mt) {
+				String nameMethod = getNameMethod.invoke(m).toString();
+				if (!Preferences.getPreference(ForecatPreferences.FORECAT_IGNORE_OMEGAT_ENGINES)
 						.contains(":" + nameMethod.replace(":", ";") + ":")) {
-					ret.add(m);
+					if (Preferences.getPreference(ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES)
+							.contains(":" + nameMethod.replace(":", ";") + ":")) {
+						ret.add(m);
+					}
 				}
+				// System.out.println(getNameMethod.invoke(m));
 			}
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
+				| NoSuchMethodException | InvocationTargetException e) {
+			System.out.println("Forecat error: querying OmegaT engines " + e.getMessage());
 		}
 
 		return ret;
@@ -146,7 +156,9 @@ public class TranslationServerSide {
 		List<IMachineTranslation> enabledMT = getOmegaTMT();
 		String translation = null;
 		boolean oldEnabledField = false;
-		
+		Method m;
+		Field enabledField = null;
+
 		if (enabledMT.size() == 0) {
 			System.err.println("No MT system enabled for forecat_PTS");
 			return;
@@ -154,7 +166,6 @@ public class TranslationServerSide {
 
 		for (IMachineTranslation im : enabledMT) {
 			try {
-				Method m;
 				// Check if the IMachineTranslation implementation provides a
 				// massTranslate method
 				m = im.getClass().getDeclaredMethod("massTranslate", Language.class, Language.class, List.class);
@@ -182,14 +193,23 @@ public class TranslationServerSide {
 									+ casedTranslation.substring(1);
 						}
 					}
+
 					addSegment(segmentPairs, segmentCounts, casedTranslation, "omegaTMT", sourceSegments.get(i));
 				}
 			} catch (IllegalArgumentException | NoSuchMethodException | SecurityException | IllegalAccessException
 					| InvocationTargetException e) {
 				// Else, translate segment by segment
+				// e.printStackTrace();
+				// e.getCause().printStackTrace();
+				try {
+					enabledField = BaseTranslate.class.getDeclaredField("enabled");
+					enabledField.setAccessible(true);
+					oldEnabledField = enabledField.getBoolean(im);
+					enabledField.set(((BaseTranslate) im), true);
+				} catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException ex) {
+					System.out.println("Forecat error: querying OmegaT engines " + ex.getMessage());
+				}
 
-				oldEnabledField = im.isEnabled();
-				im.setEnabled(true);
 				for (SourceSegment ss : sourceSegments) {
 					try {
 						translation = im.getTranslation(sLang, tLang, ss.getSourceSegmentText());
@@ -198,7 +218,11 @@ public class TranslationServerSide {
 					}
 					addSegments(segmentPairs, segmentCounts, translation.toLowerCase(), "OmegaTMT", ss);
 				}
-				im.setEnabled(oldEnabledField);
+				try {
+					enabledField.set(((BaseTranslate) im), oldEnabledField);
+				} catch (IllegalArgumentException | IllegalAccessException ex) {
+					System.out.println("Forecat error: querying OmegaT engines " + ex.getMessage());
+				}
 			}
 		}
 	}
