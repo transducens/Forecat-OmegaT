@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -22,6 +23,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
 import org.omegat.core.Core;
+import org.omegat.core.machinetranslators.MachineTranslators;
 import org.omegat.gui.exttrans.IMachineTranslation;
 import org.omegat.gui.exttrans.MachineTranslateTextArea;
 import org.omegat.util.Preferences;
@@ -364,16 +366,12 @@ public class ForecatPreferencesDialog extends JDialog {
 	}
 
 	protected void getOmegaTMT() {
-		IMachineTranslation mt[];
-		MachineTranslateTextArea mtta = Core.getMachineTranslatePane();
-		Field f;
+		List<IMachineTranslation> mt;
 		String enabled = Preferences.getPreference(ForecatPreferences.FORECAT_ENABLED_OMEGAT_ENGINES);
 		String ignore = Preferences.getPreference(ForecatPreferences.FORECAT_IGNORE_OMEGAT_ENGINES);
 
 		try {
-			f = MachineTranslateTextArea.class.getDeclaredField("translators");
-			f.setAccessible(true);
-			mt = (IMachineTranslation[]) f.get(mtta);
+			mt = MachineTranslators.getMachineTranslators();
 
 			Method getNameMethod = IMachineTranslation.class.getDeclaredMethod("getName");
 			getNameMethod.setAccessible(true);
@@ -392,7 +390,7 @@ public class ForecatPreferencesDialog extends JDialog {
 				}
 			}
 			list.setModel(model);
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
+		} catch (SecurityException | IllegalArgumentException | IllegalAccessException
 				| NoSuchMethodException | InvocationTargetException e) {
 			System.out.println("Forecat error: getting OmegaT MT engines " + e.getMessage());
 		}

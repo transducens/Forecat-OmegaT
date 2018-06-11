@@ -5,21 +5,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.miniforecat.SessionShared;
 import org.miniforecat.utils.PropertiesShared;
 import org.miniforecat.utils.SubIdProvider;
-import org.miniforecat.utils.UtilsShared;
 import org.omegat.core.Core;
-import org.omegat.core.machinetranslators.BaseTranslate;
 import org.omegat.gui.exttrans.IMachineTranslation;
-import org.omegat.gui.exttrans.MachineTranslateTextArea;
 import org.omegat.plugins.autocomplete.forecat.preferences.ForecatPreferences;
 import org.omegat.util.Language;
 import org.omegat.util.Preferences;
+import org.omegat.core.machinetranslators.BaseTranslate;
+import org.omegat.core.machinetranslators.MachineTranslators;
 
 public class TranslationServerSide {
 
@@ -120,15 +118,10 @@ public class TranslationServerSide {
 	public boolean showUnknown = false;
 
 	protected List<IMachineTranslation> getOmegaTMT() {
-		IMachineTranslation mt[];
+		List<IMachineTranslation> mt;
 		ArrayList<IMachineTranslation> ret = new ArrayList<IMachineTranslation>();
-		MachineTranslateTextArea mtta = Core.getMachineTranslatePane();
-		Field f;
 		try {
-			f = MachineTranslateTextArea.class.getDeclaredField("translators");
-			f.setAccessible(true);
-			mt = (IMachineTranslation[]) f.get(mtta);
-
+			mt = MachineTranslators.getMachineTranslators();
 			Method getNameMethod = IMachineTranslation.class.getDeclaredMethod("getName");
 			getNameMethod.setAccessible(true);
 			for (IMachineTranslation m : mt) {
@@ -140,10 +133,9 @@ public class TranslationServerSide {
 						ret.add(m);
 					}
 				}
-				// System.out.println(getNameMethod.invoke(m));
 			}
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
-				| NoSuchMethodException | InvocationTargetException e) {
+		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException
+				| InvocationTargetException e) {
 			System.out.println("Forecat error: querying OmegaT engines " + e.getMessage());
 		}
 
@@ -179,9 +171,8 @@ public class TranslationServerSide {
 				for (int i = 0; i < sourceSegments.size(); i++) {
 
 					/*
-					 * Only remove the capitalization of the first letter if a
-					 * word starts in capital. If the second word is
-					 * capitalized, we suppose its an acronym
+					 * Only remove the capitalization of the first letter if a word starts in
+					 * capital. If the second word is capitalized, we suppose its an acronym
 					 * 
 					 */
 
@@ -199,16 +190,8 @@ public class TranslationServerSide {
 			} catch (IllegalArgumentException | NoSuchMethodException | SecurityException | IllegalAccessException
 					| InvocationTargetException e) {
 				// Else, translate segment by segment
-				// e.printStackTrace();
-				// e.getCause().printStackTrace();
-				try {
-					enabledField = BaseTranslate.class.getDeclaredField("enabled");
-					enabledField.setAccessible(true);
-					oldEnabledField = enabledField.getBoolean(im);
-					enabledField.set(((BaseTranslate) im), true);
-				} catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException ex) {
-					System.out.println("Forecat error: querying OmegaT engines " + ex.getMessage());
-				}
+				oldEnabledField = im.isEnabled();
+				im.setEnabled(true);
 
 				for (SourceSegment ss : sourceSegments) {
 					try {
@@ -218,11 +201,9 @@ public class TranslationServerSide {
 					}
 					addSegments(segmentPairs, segmentCounts, translation.toLowerCase(), "OmegaTMT", ss);
 				}
-				try {
-					enabledField.set(((BaseTranslate) im), oldEnabledField);
-				} catch (IllegalArgumentException | IllegalAccessException ex) {
-					System.out.println("Forecat error: querying OmegaT engines " + ex.getMessage());
-				}
+
+				im.setEnabled(oldEnabledField);
+
 			}
 		}
 	}

@@ -117,7 +117,6 @@ public class ForecatPTS extends BaseTranslate {
 		outputTranslation = IForecatInterface.getForecatInterface().translate(inputTranslation);
 
 		return ("Number of segments: " + outputTranslation.getNumberSegments() + "\n");
-
 	}
 
 	public static void addForecatView() {
