@@ -195,7 +195,10 @@ public class TranslationServerSide {
 
 				for (SourceSegment ss : sourceSegments) {
 					try {
-						translation = im.getTranslation(sLang, tLang, ss.getSourceSegmentText());
+						translation = im.getCachedTranslation(sLang, tLang, ss.getSourceSegmentText());
+						if (translation == null) {
+							translation = im.getTranslation(sLang, tLang, ss.getSourceSegmentText());
+						}
 					} catch (Exception ex) {
 						System.out.println("Forecat error: querying OmegaT engines " + ex.getMessage());
 					}
