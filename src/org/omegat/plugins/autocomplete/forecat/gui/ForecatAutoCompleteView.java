@@ -12,6 +12,8 @@ import org.miniforecat.ranker.Pair;
 import org.miniforecat.suggestions.SuggestionsInput;
 import org.miniforecat.suggestions.SuggestionsOutput;
 import org.miniforecat.utils.AlignmentsHelper;
+import org.omegat.core.Core;
+import org.omegat.gui.editor.autocompleter.AutoCompleter;
 import org.omegat.gui.editor.autocompleter.AutoCompleterItem;
 import org.omegat.gui.editor.autocompleter.AutoCompleterListView;
 import org.omegat.plugins.autocomplete.forecat.ForecatPTS;
@@ -198,9 +200,10 @@ public class ForecatAutoCompleteView extends AutoCompleterListView {
 						"Selected the " + (selected + 1) + " suggestion.");
 				JList<AutoCompleterItem> list = super.getList();
 				list.setSelectedIndex(selected);
-				e.setKeyCode(KeyEvent.VK_ENTER);
-				e.setModifiers(0);
-				return false;
+				((AutoCompleter)Core.getEditor().getAutoCompleter()).doSelection();
+//				e.setKeyCode(KeyEvent.VK_ENTER);
+//				e.setModifiers(0);
+				return true;
 			}
 		}
 		if (StaticUtils.isKey(e, KeyEvent.VK_TAB, 0)) {
