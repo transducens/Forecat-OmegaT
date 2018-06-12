@@ -8,11 +8,11 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
 import org.apache.commons.lang.StringUtils;
-import org.miniforecat.ranker.Pair;
 import org.miniforecat.suggestions.SuggestionsInput;
 import org.miniforecat.suggestions.SuggestionsOutput;
 import org.miniforecat.utils.AlignmentsHelper;
 import org.omegat.core.Core;
+import org.omegat.gui.editor.EditorController;
 import org.omegat.gui.editor.autocompleter.AutoCompleter;
 import org.omegat.gui.editor.autocompleter.AutoCompleterItem;
 import org.omegat.gui.editor.autocompleter.AutoCompleterListView;
@@ -77,7 +77,8 @@ public class ForecatAutoCompleteView extends AutoCompleterListView {
 	@Override
 	public List<AutoCompleterItem> computeListData(String prevText, boolean contextualOnly) {
 
-		if (!ForecatPTS.isEnabled()) {
+		if (!ForecatPTS.isEnabled() || !((EditorController) Core.getEditor()).getCurrentEntry().getKey()
+				.equals(ForecatPTS.currentSegmentKey)) {
 			return new ArrayList<AutoCompleterItem>();
 		}
 
@@ -200,9 +201,9 @@ public class ForecatAutoCompleteView extends AutoCompleterListView {
 						"Selected the " + (selected + 1) + " suggestion.");
 				JList<AutoCompleterItem> list = super.getList();
 				list.setSelectedIndex(selected);
-				((AutoCompleter)Core.getEditor().getAutoCompleter()).doSelection();
-//				e.setKeyCode(KeyEvent.VK_ENTER);
-//				e.setModifiers(0);
+				((AutoCompleter) Core.getEditor().getAutoCompleter()).doSelection();
+				// e.setKeyCode(KeyEvent.VK_ENTER);
+				// e.setModifiers(0);
 				return true;
 			}
 		}

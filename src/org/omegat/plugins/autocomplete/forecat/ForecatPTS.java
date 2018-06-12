@@ -13,7 +13,9 @@ import org.miniforecat.translation.TranslationInput;
 import org.miniforecat.translation.TranslationOutput;
 import org.miniforecat.utils.AlignmentsHelper;
 import org.omegat.core.Core;
+import org.omegat.core.data.EntryKey;
 import org.omegat.core.machinetranslators.BaseTranslate;
+import org.omegat.gui.editor.EditorController;
 import org.omegat.gui.editor.autocompleter.AutoCompleterItem;
 import org.omegat.plugins.autocomplete.forecat.adapter.ForecatMiniInterface;
 import org.omegat.plugins.autocomplete.forecat.adapter.ForecatWebServiceInterface;
@@ -37,6 +39,8 @@ public class ForecatPTS extends BaseTranslate {
 
 	private static int maxSegmentLength = 4;
 	private static int minSegmentLength = 1;
+	
+	public static EntryKey currentSegmentKey;
 
 	public static boolean isEnabled()
 	{
@@ -116,6 +120,8 @@ public class ForecatPTS extends BaseTranslate {
 		TranslationOutput outputTranslation = null;
 		outputTranslation = IForecatInterface.getForecatInterface().translate(inputTranslation);
 
+		currentSegmentKey = ((EditorController)Core.getEditor()).getCurrentEntry().getKey();
+		
 		return ("Number of segments: " + outputTranslation.getNumberSegments() + "\n");
 	}
 
